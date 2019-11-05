@@ -1,0 +1,90 @@
+#   -*- shell-script -*-
+
+cygwin=false
+darwin=false
+hpux=false
+linux=false
+mingw=false
+os400=false
+case "`uname -s`" in
+CYGWIN*) cygwin=true;;
+Darwin*) darwin=true;;
+HP-UX*) hpux=true;;
+Linux*) linux=true;;
+MINGW*) mingw=true;;
+OS400*) os400=true;;
+esac
+
+### https://superuser.com/questions/39751/
+#mw Skip the directory existence check during setup phase; some directories are getting created
+#    if [ -d "$ARG" ] && [[ ":$PATH:" != *":$ARG:"* ]]; then
+pathappend() {
+  for ARG in "$@"; do
+    if [ -d "$ARG" ] && [[ ":$PATH:" != *":$ARG:"* ]]; then
+        PATH="${PATH:+"$PATH:"}$ARG"
+    fi
+  done
+}
+
+# Add $@ args to beginning of $PATH
+pathprepend() {
+  for ((i=$#; i>0; i--)); do
+    ARG="${!i}"
+    if [ -d "$ARG" ] && [[ ":$PATH:" != *":$ARG:"* ]]; then
+        PATH="$ARG${PATH:+":$PATH"}"
+    fi
+  done
+}
+
+# simple extension of https://stackoverflow.com/questions/370047
+# Delete $@ args from $PATH
+pathdelete() {
+    local IFS=':'
+    t=($PATH)
+    n=${#t[*]}
+    a=()
+    for ARG in "$@"; do
+		for ((i=0;i<n;i++)); do
+			p="${t[i]%%*"$ARG"*}"
+			[ "${p}" ] && a[i]="${p}"
+		done
+    done
+
+    PATH="${a[*]}"
+}    
+###
+
+parse_git_branch() {
+  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+
+# from https://thrysoee.dk/pushd/
+cd() {
+   local i MAX LEN p
+
+   MAX=10
+   LEN=${#DIRSTACK[@]}
+
+   if [ $# -eq 0 ] || [ "$1" = "-" ]; then
+      builtin cd "$@" || return 1
+      pushd -n $OLDPWD > /dev/null
+   else
+      pushd "$@" > /dev/null || return 1
+   fi
+
+   if [ $LEN -gt 1 ]; then
+      for ((i=1; i <= LEN ; i++)); do
+         eval p=~$i
+         if [ "$p" = "$PWD" ]; then
+            popd -n +$i > /dev/null
+            break
+         fi
+      done
+   fi
+
+   if [ $LEN -ge $MAX ]; then
+      popd -n -0 > /dev/null
+   fi
+}
+
+

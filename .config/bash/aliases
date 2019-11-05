@@ -1,0 +1,135 @@
+#   -*- shell-script -*-
+
+GRAY='\033[0;37m'
+   RED='\033[0;31m'
+YELLOW='\033[0;33m'
+ GREEN='\033[0;32m'
+  CYAN='\033[0;36m'
+  BLUE='\033[0;34m'
+
+  BGRAY='\033[1;30m'
+   BRED='\033[1;31m'
+BYELLOW='\033[1;33m'
+ BGREEN='\033[1;32m'
+  BCYAN='\033[1;36m'
+  BLUEB='\033[1;34m'
+ NORMAL='\033[00m'
+
+NO_COLOR='\033[0m'
+
+alias git-sync='git stash && git fetch upstream develop && git checkout master && git rebase upstream/develop && git push -f origin && git stash pop'
+alias git-branch-sync='git fetch upstream branch-4.19 && git checkout branch-4.19 && git stash && git rebase upstream/branch-4.19 && git push -u origin branch-4.19 && git stash pop'
+
+alias ec="emacsclient -n"
+alias p=pushd
+alias pp=popd
+
+cd-le(){
+	cd "${WSHOME}/${1:+le-$1}"
+}
+alias cdl="cd-le"
+
+
+cd-java(){
+	# for the first $2 use, chop everything past slash
+    cd "${WSHOME}/le-${2/\/*}/src/${1}/java/com/latticeengines/${2}"
+}
+alias cdm="cd-java main"
+alias cdt="cd-java test"
+
+alias dirs='echo -en "$GRAY"; dirs -v; echo -en "$NO_COLOR"'
+
+alias jfind="find . -name \*.java -type f | xargs grep -i "
+alias xfind="find . -name pom.xml -type f | xargs grep -i "
+alias spark-bounce="${LIVY_HOME}/bin/livy-server stop && ${SPARK_HOME}/sbin/stop-all.sh && ${SPARK_HOME}/sbin/start-all.sh && ${LIVY_HOME}/bin/livy-server start"
+alias spark-stop="${LIVY_HOME}/bin/livy-server stop && ${SPARK_HOME}/sbin/stop-all.sh"
+
+# better safe than sorry
+alias rm="rm -i"
+alias mv="mv -i"
+alias cp="cp -i"
+
+alias showpath='echo $PATH | tr : "\n"'
+
+alias curlh='curl -k -H "Content-Type: application/json" -H "MagicAuthentication: ${MAGIC}"'
+
+# bash 2.04 or later syntax
+alias clear-scrollback=$'/usr/bin/osascript -e \'tell application "System Events" to tell process "Terminal" to keystroke "k" using command down\''
+
+#' <- help emacs font-lock
+
+#Tomcat
+reload-tcsvc(){
+	ls -l "${CATALINA_HOME}/webapps/${1}/manager/WEB-INF/web.xml"
+	touch "${CATALINA_HOME}/webapps/${1}/manager/WEB-INF/web.xml"
+	ls -l "${CATALINA_HOME}/webapps/${1}/manager/WEB-INF/web.xml"
+}  
+alias rld="reload-tcsvc"
+alias rldtc="find /opt/tomcat -name web.xml | xargs touch"
+
+tomcat-logs (){
+	logs = $(gfind /opt/tomcat/logs -name manager\*.log -printf '%p\n' | sort -r | head -1)
+}
+
+alias lnav-logs="lnav /var/logs/ledp/*.log /opt/tomcat/logs/*.{log,out}"
+
+alias mvn="mvn -T6"
+
+# alias rbldcdl='pushd $WSHOME/le-serviceapps/cdl && mvn -DskipTests clean install && popd && msbld && cp $WSHOME/le-microservice/cdl/target/le-cdl-microservice-*-SNAPSHOT.war /opt/tomcat/webapps/ms/cdl.war && popd'
+
+rebuildms (){
+	pushd "${WSHOME}/le-${1}"
+	mvn -DskipTests clean install
+	popd
+	msbld
+	cp "${WSHOME}"/le-microservice/${1}/target/le-${1}-microservice-*-SNAPSHOT.war "${CATALINA_HOME}"/webapps/ms/${1}.war
+    # Tomcat should notice new .war file		
+#    touch "${CATALINA_HOME}/webapps/ms/${1}/WEB-INF/web.xml"
+}
+alias rbldobj="rebuildms objectapi"
+
+zklist (){
+	zk-shell localhost --run-once "get /Pods/Default/Contracts/${1}/Tenants/${1}/Spaces/Production/Services/CDL/Diagnostics/QueryLogging"
+}
+
+zkcreate (){
+	zk-shell localhost --run-once "create /Pods/Default/Contracts/${1}/Tenants/${1}/Spaces/Production/Services/CDL/Diagnostics/QueryLogging true false false true"
+	zklist ${1}
+}
+
+zkset (){
+	zk-shell localhost --run-once "set /Pods/Default/Contracts/${1}/Tenants/${1}/Spaces/Production/Services/CDL/Diagnostics/QueryLogging true"
+	zklist ${1}
+}
+
+zkunset (){
+	zk-shell localhost --run-once "set /Pods/Default/Contracts/${1}/Tenants/${1}/Spaces/Production/Services/CDL/Diagnostics/QueryLogging false"
+	zklist ${1}
+}
+
+zkrm (){
+	zk-shell localhost --run-once "rm /Pods/Default/Contracts/${1}/Tenants/${1}/Spaces/Production/Services/CDL/Diagnostics/QueryLogging"
+	zk-shell localhost --run-once "rm /Pods/Default/Contracts/${1}/Tenants/${1}/Spaces/Production/Services/CDL/Diagnostics"
+}
+
+# Mac OS X specific aliases
+if $darwin; then
+   alias ldd="otool -L"
+   hash gdircolors 2>/dev/null && alias dircolors=gdircolors
+   hash gsort 2>/dev/null && alias sort=gsort
+fi
+
+# Use GNU ls on macOS instead of BSD
+hash gls 2>/dev/null && LS="gls" || LS="ls"
+
+# Listing directory contents
+alias ls='LC_COLLATE=C '$LS' --color=auto --group-directories-first'
+alias l='ls -CFa'
+alias ll='ls -alF'
+alias lsd='ls -Gal | grep ^d'
+unset LS
+
+# From https://www.atlassian.com/git/tutorials/dotfiles
+# git init --bare $HOME/.cfg
+alias config='/usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME'
+# config config --local status.showUntrackedFiles no
