@@ -2,6 +2,86 @@
 
 (package-initialize) ;; make sure 'package-archives is defined & pass member check w/o void-variable err
 
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector
+   ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
+ '(blink-cursor-mode nil)
+ '(custom-enabled-themes (quote (idea-darkula-mw)))
+ '(custom-safe-themes
+   (quote
+    ("a2286409934b11f2f3b7d89b1eaebb965fd63bc1e0be1c159c02e396afb893c8" "b8c540fe258780c3aabd79affb9c0b7d560c46b372c90abb756432a4c872f8dc" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "2d1fe7c9007a5b76cea4395b0fc664d0c1cfd34bb4f1860300347cdad67fb2f9" "f30aded97e67a487d30f38a1ac48eddb49fdb06ac01ebeaff39439997cbdd869" "420689cc31d01fe04b8e3adef87b8838ff52faa169e69ca4e863143ae9f3a9f9" default)))
+ '(desktop-modes-not-to-save
+   (quote
+    (tags-table-mode dired-mode Info-mode treemacs-mode info-lookup-mode fundamental-mode)))
+ '(desktop-save-mode t)
+ '(fci-rule-color "#5B6268")
+ '(hl-todo-keyword-faces
+   (quote
+    (("TODO" . "#dc752f")
+     ("NEXT" . "#dc752f")
+     ("THEM" . "#2d9574")
+     ("PROG" . "#4f97d7")
+     ("OKAY" . "#4f97d7")
+     ("DONT" . "#f2241f")
+     ("FAIL" . "#f2241f")
+     ("DONE" . "#86dc2f")
+     ("NOTE" . "#b1951d")
+     ("KLUDGE" . "#b1951d")
+     ("HACK" . "#b1951d")
+     ("TEMP" . "#b1951d")
+     ("FIXME" . "#dc752f")
+     ("XXX+" . "#dc752f")
+     ("\\?\\?\\?+" . "#dc752f"))))
+ '(ivy-mode nil)
+ '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
+ '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
+ '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
+ '(lsp-enable-file-watchers nil)
+ '(lsp-java-server-install-dir "~/lib/eclipse.jdt.ls/server/")
+ '(lsp-java-workspace-dir "/Users/mwarren/workspace/")
+ '(objed-cursor-color "#ff6c6b")
+ '(package-selected-packages
+   (quote
+    (scala-mode flymake ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes lsp-java-boot spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+ '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
+ '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
+ '(tool-bar-style (quote text))
+ '(vc-annotate-background "#282c34")
+ '(vc-annotate-color-map
+   (list
+    (cons 20 "#98be65")
+    (cons 40 "#b4be6c")
+    (cons 60 "#d0be73")
+    (cons 80 "#ECBE7B")
+    (cons 100 "#e6ab6a")
+    (cons 120 "#e09859")
+    (cons 140 "#da8548")
+    (cons 160 "#d38079")
+    (cons 180 "#cc7cab")
+    (cons 200 "#c678dd")
+    (cons 220 "#d974b7")
+    (cons 240 "#ec7091")
+    (cons 260 "#ff6c6b")
+    (cons 280 "#cf6162")
+    (cons 300 "#9f585a")
+    (cons 320 "#6f4e52")
+    (cons 340 "#5B6268")
+    (cons 360 "#5B6268")))
+ '(vc-annotate-very-old-color nil)
+ '(which-key-mode t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "nil" :family "Iosevka"))))
+ '(log4j-font-lock-debug-face ((t (:foreground "salmon"))))
+ '(log4j-font-lock-info-face ((t (:foreground "medium spring green")))))
+
 (add-to-list 'load-path (expand-file-name "elisp" user-emacs-directory))
 
 ;; Melpa - https://melpa.org/#/getting-started has a more detailed function handling 
@@ -24,7 +104,7 @@ There are two things you can do about this warning:
 
 (add-to-list 'package-archives
              '("org" . "http://orgmode.org/elpa/"))
-    
+
 ;; Setup automatic installation of packages on 
 ;; https://www.reddit.com/r/emacs/comments/4fqu0a/automatically_install_packages_on_startup/
 (setq use-package-compute-statistics t
@@ -137,6 +217,12 @@ There are two things you can do about this warning:
 ;; (add-hook 'java-mode-hook 'eclim-mode)
 ;; (require 'eclimd)
 
+(use-package company-lsp
+   :config
+   (push 'company-lsp company-backends))
+
+(use-package flycheck)
+
 ;; Language Server Protocol
 (use-package lsp-mode
   :hook (java-mode . lsp-deferred)
@@ -154,11 +240,6 @@ There are two things you can do about this warning:
 ;;  (require 'lsp-intellij)
 ;;  (add-hook 'java-mode-hook #'lsp-intellij-enable))
 
-(use-package company-lsp
-   :config
-   (push 'company-lsp company-backends))
-
-(use-package flycheck)
 (use-package lsp-ui
    :config (progn
 	     (add-hook 'lsp-mode-hook 'lsp-ui-mode)
@@ -167,13 +248,18 @@ There are two things you can do about this warning:
 (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
 
+
+(require 'lsp-ui-flycheck)
+(with-eval-after-load 'lsp-mode
+  (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable 1))))
+
 ;; This isn't available in melpa/elpa and so I've stashed it locally 2019-10. Update when it's there.
 ;; Spring Boot helper
 (load-library "lsp-java-boot")
 
 ;; to enable the lenses
 (with-eval-after-load 'lsp-java-boot
-  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+b  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
   (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode))
 
 (defun sqlparse-region (beg end)
@@ -264,8 +350,15 @@ There are two things you can do about this warning:
 	("C-x t B"   . treemacs-bookmark)
 	("C-x t M-t" . treemacs-find-tag))
   :config
-  (add-hook 'treemacs-mode-hook (lambda () (treemacs-resize-icons  16)))
-  )
+  (add-hook 'treemacs-mode-hook (lambda () (treemacs-resize-icons  16))))
+
+(defun toggle-n-next ()
+  (interactive)
+    (treemacs--expand-dir-node (treemacs-current-button))
+    (treemacs-next-line))
+;; (treemacs-define-RET-action ’dir-node-closed (lambda () (progn treemacs-toggle-node treemacs-next-line)))
+
+;;mw Treemacs stuff that broke init.el somewhere
 
 ;;   :after all-the-icons projectile hide-mode-line
 ;;   :init
@@ -338,86 +431,16 @@ There are two things you can do about this warning:
                 "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
                 "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
 	        "\\)$"))
-(setq desktop-modes-not-to-save '(dired-mode tags-table-mode dired-mode Info-mode treemacs-mode info-lookup-mode fundamental-mode))
-;; (add-to-list 'desktop-modes-not-to-save 'Info-mode)
-;; (add-to-list 'desktop-modes-not-to-save 'info-lookup-mode)
-;; (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
- '(blink-cursor-mode nil)
- '(custom-enabled-themes (quote (idea-darkula-mw)))
- '(custom-safe-themes
-   (quote
-    ("b8c540fe258780c3aabd79affb9c0b7d560c46b372c90abb756432a4c872f8dc" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "2d1fe7c9007a5b76cea4395b0fc664d0c1cfd34bb4f1860300347cdad67fb2f9" "f30aded97e67a487d30f38a1ac48eddb49fdb06ac01ebeaff39439997cbdd869" "420689cc31d01fe04b8e3adef87b8838ff52faa169e69ca4e863143ae9f3a9f9" default)))
- '(desktop-save-mode t)
- '(fci-rule-color "#5B6268")
- '(hl-todo-keyword-faces
-   (quote
-    (("TODO" . "#dc752f")
-     ("NEXT" . "#dc752f")
-     ("THEM" . "#2d9574")
-     ("PROG" . "#4f97d7")
-     ("OKAY" . "#4f97d7")
-     ("DONT" . "#f2241f")
-     ("FAIL" . "#f2241f")
-     ("DONE" . "#86dc2f")
-     ("NOTE" . "#b1951d")
-     ("KLUDGE" . "#b1951d")
-     ("HACK" . "#b1951d")
-     ("TEMP" . "#b1951d")
-     ("FIXME" . "#dc752f")
-     ("XXX+" . "#dc752f")
-     ("\\?\\?\\?+" . "#dc752f"))))
- '(ivy-mode nil)
- '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
- '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
- '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
- '(lsp-enable-file-watchers nil)
- '(lsp-java-workspace-dir "/Users/mwarren/workspace/")
- '(objed-cursor-color "#ff6c6b")
- '(package-selected-packages
-   (quote
-    (ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes lsp-java-boot spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
- '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
- '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
- '(tool-bar-style (quote text))
- '(vc-annotate-background "#282c34")
- '(vc-annotate-color-map
-   (list
-    (cons 20 "#98be65")
-    (cons 40 "#b4be6c")
-    (cons 60 "#d0be73")
-    (cons 80 "#ECBE7B")
-    (cons 100 "#e6ab6a")
-    (cons 120 "#e09859")
-    (cons 140 "#da8548")
-    (cons 160 "#d38079")
-    (cons 180 "#cc7cab")
-    (cons 200 "#c678dd")
-    (cons 220 "#d974b7")
-    (cons 240 "#ec7091")
-    (cons 260 "#ff6c6b")
-    (cons 280 "#cf6162")
-    (cons 300 "#9f585a")
-    (cons 320 "#6f4e52")
-    (cons 340 "#5B6268")
-    (cons 360 "#5B6268")))
- '(vc-annotate-very-old-color nil)
- '(which-key-mode t))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+;;mw Use customize instead
+;; (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
+;; (let (modes-not-to-save '(dired-mode tags-table-mode Info-mode
+;;			  treemacs-mode info-lookup-mode fundamental-mode))
+
+
 
 (which-key-setup-side-window-right-bottom)
 
 (server-start)
 
+(put 'scroll-left 'disabled nil)

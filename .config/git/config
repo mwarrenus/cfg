@@ -1,0 +1,22 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	name = Mark Warren
+	email = mwarren@lattice-engines.com
+[merge]
+	tool = vimdiff
+	conflictstyle = diff3
+[pull]
+	rebase = true
+[mergetool]
+	prompt = false
+	keepBackup = false
+[alias]
+	ls = log --oneline -8
+[pretty]
+	log = %C(240)%h%C(reset) -%C(auto)%d%Creset %s %C(242)(%an %ar)
+	detailed = %C(cyan)%h %C(red)%ad %C(blue)[%an]%C(magenta)%d %C(white)%s
+	shorter = %C(auto)%D %C(240)--%C(242)%gD%N %ad by %C(white)%cn%C(reset)
