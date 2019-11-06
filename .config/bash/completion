@@ -3,19 +3,19 @@
 # This loads nvm bash_completion
 [ -s "$NVM_HOME/etc/bash_completion" ] && . "$NVM_HOME/etc/bash_completion"
 
-# git setup
-if [ -f "${HOME}/bin/git-completion.bash" ]; then
-	. "${HOME}/bin/git-completion.bash"
+# fast:
+# git completion 
+if [ -r "$(git --exec-path)../etc/bash_completion.d/git-completion.bash" ]; then
+	. "$(git --exec-path)../etc/bash_completion.d/git-completion.bash"
 fi
 
 # from https://docs.brew.sh/Shell-Completion
 # portable:
 # HOMEBREW_PREFIX=$(brew --prefix)
 # fast:
-
+HOMEBREW_PREFIX="/usr/local"
 # For v1, backward compat in v2:
 # export BASH_COMPLETION_COMPAT_DIR="/usr/local/etc/bash_completion.d"
-HOMEBREW_PREFIX="/usr/local"
 if type brew &>/dev/null; then
   if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
     source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
