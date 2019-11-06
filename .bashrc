@@ -1,5 +1,6 @@
 #   -*- shell-script -*-
 
+# Default PATH to something useable
 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 
 # XDG directories
@@ -10,12 +11,12 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export  XDG_CACHE_HOME="$HOME/.cache"
 export   XDG_DATA_HOME="$HOME/.local/share"
 
-
+# Explicit ordering instead of just globbing the directory
 for SUBFILE in functions exports secrets lattice; do
     [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 done
 
-#mw Confusing. Add bashrc back if we find a need.
+#mw Confusing. Add bashrc, inputrc back into the list above if we find a need.
 # [ -r "$XDG_CONFIG_HOME/bash/functions" ] && . "$XDG_CONFIG_HOME/bash/bashrc"
 
 # If not running interactively, don't do anything

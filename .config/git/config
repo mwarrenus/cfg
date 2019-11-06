@@ -1,6 +1,5 @@
 [user]
 	name = Mark Warren
-	email = mwarren@lattice-engines.com
 [merge]
 	tool = vimdiff
 	conflictstyle = diff3

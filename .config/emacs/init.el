@@ -83,6 +83,8 @@
  '(log4j-font-lock-debug-face ((t (:foreground "salmon"))))
  '(log4j-font-lock-info-face ((t (:foreground "medium spring green")))))
 
+
+;;; Use the custom-set-{variables,faces} wherever possible. Minimize the things below.
 (add-to-list 'load-path (expand-file-name "elisp" user-emacs-directory))
 
 ;; Melpa - https://melpa.org/#/getting-started has a more detailed function handling 
@@ -260,7 +262,7 @@ There are two things you can do about this warning:
 
 ;; to enable the lenses
 (with-eval-after-load 'lsp-java-boot
-b  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
   (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode))
 
 (defun sqlparse-region (beg end)
@@ -438,10 +440,9 @@ b  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
 ;; (let (modes-not-to-save '(dired-mode tags-table-mode Info-mode
 ;;			  treemacs-mode info-lookup-mode fundamental-mode))
 
-
-
 (which-key-setup-side-window-right-bottom)
 
 (server-start)
 
+;; Automatically inserted by emacs
 (put 'scroll-left 'disabled nil)
