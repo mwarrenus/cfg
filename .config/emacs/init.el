@@ -1,4 +1,4 @@
-(setq debug-on-error 't)
+; (setq debug-on-error 't)
 
 (package-initialize) ;; make sure 'package-archives is defined & pass member check w/o void-variable err
 
@@ -19,6 +19,12 @@
    (quote
     (tags-table-mode dired-mode Info-mode treemacs-mode info-lookup-mode fundamental-mode)))
  '(desktop-save-mode t)
+ '(ecb-options-version "2.50")
+ '(ecb-source-path
+   (quote
+    (("/Users/mwarren/Projects/ledp" "ledp")
+     ("/Users/mwarren/Projects/leui" "leui")
+     ("/Users/mwarren/Projects/emacs/mituharu-emacs-mac-3bf213d502a8" "emacs"))))
  '(fci-rule-color "#5B6268")
  '(hl-todo-keyword-faces
    (quote
@@ -47,7 +53,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (logview scala-mode flymake ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes lsp-java-boot spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes lsp-java-boot spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
  '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
  '(tool-bar-style (quote text))
@@ -80,11 +86,10 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "nil" :family "Iosevka"))))
+ '(hl-line ((t (:background "dark olive green"))))
  '(log4j-font-lock-debug-face ((t (:foreground "salmon"))))
  '(log4j-font-lock-info-face ((t (:foreground "medium spring green")))))
 
-
-;;; Use the custom-set-{variables,faces} wherever possible. Minimize the things below.
 (add-to-list 'load-path (expand-file-name "elisp" user-emacs-directory))
 
 ;; Melpa - https://melpa.org/#/getting-started has a more detailed function handling 
@@ -204,12 +209,11 @@ There are two things you can do about this warning:
 ; (powerline-default-theme)
 
 (use-package spaceline)
-;; (spaceline-emacs-theme)
-;; (spaceline-spacemacs-theme)
 (use-package spaceline-all-the-icons
   :after spaceline
   :init (spaceline-all-the-icons-theme))
-
+;; (spaceline-emacs-theme)
+;; (spaceline-spacemacs-theme)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Emacs Java developer tools
@@ -219,7 +223,8 @@ There are two things you can do about this warning:
 ;; (require 'eclim)
 ;; (add-hook 'java-mode-hook 'eclim-mode)
 ;; (require 'eclimd)
-
+;;
+;; LSP - Language Server Protocol. Newer, lighter weight option using the lsp protocol from Microsoft
 (use-package company-lsp
    :config
    (push 'company-lsp company-backends))
@@ -294,6 +299,15 @@ There are two things you can do about this warning:
 
 (use-package magit-find-file
   :bind (:map global-map ("C-c p" .  'magit-find-file-completing-read)))
+
+;; https://writequit.org/articles/working-with-logs-in-emacs.html
+(use-package log4j-mode
+  :ensure t
+  :disabled t
+  :init
+  (add-hook #'log4j-mode-hook #'view-mode)
+  (add-hook #'log4j-mode-hook #'read-only-mode)
+  (add-hook #'log4j-mode-hook 'eos/turn-on-hl-line))
 
 ;;  (progn
 ;;    (setq initial-frame-alist '( (tool-bar-lines . 0)))
