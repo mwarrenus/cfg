@@ -53,7 +53,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes lsp-java-boot spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes lsp-java-boot spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
  '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
  '(tool-bar-style (quote text))
@@ -86,11 +86,11 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "nil" :family "Iosevka"))))
+ '(Man-overstrike ((t (:inherit bold :foreground "orange"))))
+ '(Man-underline ((t (:inherit underline :foreground "medium spring green"))))
  '(hl-line ((t (:background "dark olive green"))))
  '(log4j-font-lock-debug-face ((t (:foreground "salmon"))))
  '(log4j-font-lock-info-face ((t (:foreground "medium spring green")))))
-
-(add-to-list 'load-path (expand-file-name "elisp" user-emacs-directory))
 
 ;; Melpa - https://melpa.org/#/getting-started has a more detailed function handling 
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
@@ -113,7 +113,10 @@ There are two things you can do about this warning:
 (add-to-list 'package-archives
              '("org" . "http://orgmode.org/elpa/"))
 
-;; Setup automatic installation of packages on 
+(add-to-list 'load-path (expand-file-name "elisp" user-emacs-directory))
+
+
+;; Try to configure automatic installation of packages. Doesn't work very well for unconfigured packages.
 ;; https://www.reddit.com/r/emacs/comments/4fqu0a/automatically_install_packages_on_startup/
 (setq use-package-compute-statistics t
       use-package-always-ensure t)
@@ -135,10 +138,14 @@ There are two things you can do about this warning:
   (helm-flx-mode 1)
   (define-key global-map [remap find-file] 'helm-find-files)
   (define-key global-map [remap occur] 'helm-occur)
-  (define-key global-map [remap list-buffers] 'helm-buffers-list)
+;  (define-key global-map [remap list-buffers] 'helm-buffers-list)
   (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
   (define-key global-map [remap execute-extended-command] 'helm-M-x)
   (define-key global-map [remap apropos-command] 'helm-apropos)
+; https://emacs.stackexchange.com/questions/33727/how-does-spacemacs-allow-tab-completion-in-helm  
+  (define-key helm-map (kbd "TAB") #'helm-execute-persistent-action)
+  (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
+  (define-key helm-map (kbd "C-z") #'helm-select-action)
   (unless (boundp 'completion-in-region-function)
     (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
     (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
@@ -199,7 +206,12 @@ There are two things you can do about this warning:
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 
 (when (memq window-system '(mac ns x))
-   (exec-path-from-shell-initialize))
+  (progn
+    ; Better ls. https://emacs.stackexchange.com/questions/29096/how-to-sort-directories-first-in-dired
+    (setq insert-directory-program "gls" dired-use-ls-dired t)
+    ; for Fira Code font ligatures. https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
+    (mac-auto-operator-composition-mode)
+    (exec-path-from-shell-initialize)))
 
 (use-package all-the-icons)
 ;;  :config
@@ -256,14 +268,36 @@ There are two things you can do about this warning:
 (define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
 (define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
 
-
 (require 'lsp-ui-flycheck)
 (with-eval-after-load 'lsp-mode
   (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable 1))))
 
 ;; This isn't available in melpa/elpa and so I've stashed it locally 2019-10. Update when it's there.
 ;; Spring Boot helper
-(load-library "lsp-java-boot")
+(require 'lsp-java-boot)
+
+(add-to-list 'load-path (expand-file-name "elisp/LSP-Symbol-Outline" user-emacs-directory))
+(require 'lsp-symbol-outline)
+(defun lsp-symbol-outline-create-conditional ()
+    (interactive)
+    (cond ((equal major-mode 'python-mode)
+           (lsp-symbol-outline-make-outline-python))
+          ((equal major-mode 'go-mode)
+           (lsp-symbol-outline-make-outline-go))
+          ((equal major-mode 'php-mode)
+           (lsp-symbol-outline-make-outline-php))
+          ((equal major-mode 'rust-mode)
+           (lsp-symbol-outline-make-outline-rust))
+          ((or (equal major-mode 'c-mode)
+                (equal major-mode 'c++-mode))
+           (lsp-symbol-outline-make-outline-C))
+          ((or (equal major-mode 'js2-mode)
+               (equal major-mode 'js-mode)
+               (equal major-mode 'typescript-mode))
+           (lsp-symbol-outline-make-outline-js))
+          ((equal major-mode 'java-mode)
+           (lsp-symbol-outline-make-outline-java))))
+(define-key mode-specific-map "M-." 'lsp-symbol-outline-create-conditional)
 
 ;; to enable the lenses
 (with-eval-after-load 'lsp-java-boot
@@ -278,22 +312,22 @@ There are two things you can do about this warning:
    t t))
 
 ;; http://ergoemacs.org/emacs/emacs_customize_default_window_size.html
-(if (display-graphic-p)
-    (progn
-      (setq initial-frame-alist
-            '(
-              (tool-bar-lines . 0)
-              (width . 140) ; chars
-              (height . 60) ; lines
-              (left . 750)
-              (top . 0)))
-      (setq default-frame-alist
-            '(
-              (tool-bar-lines . 0)
-              (width . 140)
-              (height . 60)
-              (left . 750)
-              (top . 0)))))
+;; (if (display-graphic-p)
+    ;; (progn
+    ;;   (setq initial-frame-alist
+    ;;         '(
+    ;;           (tool-bar-lines . 0)
+    ;;           (width . 140) ; chars
+    ;;           (height . 60) ; lines
+    ;;           (left . 750)
+    ;;           (top . 0)))
+    ;;   (setq default-frame-alist
+    ;;         '(
+    ;;           (tool-bar-lines . 0)
+    ;;           (width . 140)
+    ;;           (height . 60)
+    ;;           (left . 750)
+    ;;           (top . 0)))))
 
 (use-package magit)
 
@@ -454,7 +488,8 @@ There are two things you can do about this warning:
 ;; (let (modes-not-to-save '(dired-mode tags-table-mode Info-mode
 ;;			  treemacs-mode info-lookup-mode fundamental-mode))
 
-(which-key-setup-side-window-right-bottom)
+;;(which-key-setup-side-window-right-bottom)
+(which-key-setup-minibuffer)
 
 (server-start)
 
