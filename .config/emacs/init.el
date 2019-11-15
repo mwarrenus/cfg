@@ -1,6 +1,6 @@
 ; (setq debug-on-error 't)
 
-(package-initialize) ;; make sure 'package-archives is defined & pass member check w/o void-variable err
+(package-initialize) ;; make sure 'package-archives is defined to pass member check w/o void-variable err
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -115,15 +115,15 @@ There are two things you can do about this warning:
 
 (add-to-list 'load-path (expand-file-name "elisp" user-emacs-directory))
 
-
 ;; Try to configure automatic installation of packages. Doesn't work very well for unconfigured packages.
 ;; https://www.reddit.com/r/emacs/comments/4fqu0a/automatically_install_packages_on_startup/
 (setq use-package-compute-statistics t
       use-package-always-ensure t)
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(package-install-selected-packages)
+; (unless (package-installed-p 'use-package)
+;  (package-refresh-contents)
+;  (package-install 'use-package))
 (require 'use-package)
 
 
