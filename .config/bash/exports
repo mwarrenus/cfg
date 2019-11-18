@@ -1,3 +1,4 @@
+#   -*- shell-script -*-
 ####
 # from https://serverfault.com/questions/3743/what-useful-things-can-one-add-to-ones-bashrc
 export LESS_TERMCAP_mb=$'\033[01;31m'

@@ -11,6 +11,10 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export  XDG_CACHE_HOME="$HOME/.cache"
 export   XDG_DATA_HOME="$HOME/.local/share"
 
+# Fixes for partially XDG compliant apps
+# Ref. https://wiki.archlinux.org/index.php/XDG_Base_Directory
+export INPUTRC="$XDG_CONFIG_HOME"/bash/inputrc
+
 # Explicit ordering instead of just globbing the directory
 for SUBFILE in functions exports secrets lattice; do
     [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"

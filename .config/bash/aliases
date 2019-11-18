@@ -27,7 +27,7 @@ alias pp=popd
 cd-le(){
 	cd "${WSHOME}/${1:+le-$1}"
 }
-Alias cdl="cd-le"
+alias cdl="cd-le"
 
 
 cd-java(){
