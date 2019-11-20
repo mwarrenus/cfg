@@ -13,3 +13,4 @@ else
 fi;
 config checkout
 config config status.showUntrackedFiles no
+ln -s $HOME/.config/emacs $HOME/.emacs.d
