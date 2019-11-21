@@ -17,6 +17,7 @@
    (quote
     (tags-table-mode dired-mode Info-mode treemacs-mode info-lookup-mode fundamental-mode)))
  '(desktop-save-mode t)
+ '(display-time-format "%I:%M")
  '(ecb-options-version "2.50")
  '(ecb-source-path
    (quote
@@ -45,16 +46,21 @@
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
+ '(logview-additional-timestamp-formats
+   (quote
+    (("LElogs"
+      (java-pattern . "yyyy-MM-dd'T'HH:mm:ss,SSS'Z'")))))
  '(lsp-enable-file-watchers nil)
  '(lsp-java-server-install-dir "~/lib/eclipse.jdt.ls/server/")
  '(lsp-java-workspace-dir "/Users/mwarren/workspace/")
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
  '(package-user-dir "~/lib/elpa")
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
  '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
+ '(spaceline-all-the-icons-separator-type (quote arrow))
  '(tool-bar-style (quote text))
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map
@@ -89,7 +95,9 @@
  '(Man-underline ((t (:inherit underline :foreground "medium spring green"))))
  '(hl-line ((t (:background "dark olive green"))))
  '(log4j-font-lock-debug-face ((t (:foreground "salmon"))))
- '(log4j-font-lock-info-face ((t (:foreground "medium spring green")))))
+ '(log4j-font-lock-info-face ((t (:foreground "medium spring green"))))
+ '(logview-information-entry ((t (:background "#002500"))))
+ '(parenthesis ((t (:inherit shadow :foreground "dim gray")))))
 
 
 (package-initialize) ;; make sure 'package-archives is defined to pass member check w/o void-variable err
@@ -122,6 +130,18 @@ There are two things you can do about this warning:
 (setq use-package-compute-statistics t
       use-package-always-ensure t)
 
+;;mw Redefine to show missing packages when difference > 0
+;; from lisp/elisp/package.el
+(require 'advice-patch)
+
+(with-demoted-errors "Error in advice-patch of package-install-selected-packages: %S"
+    (advice-patch 'package-install-selected-packages
+		  '(message "%d packages are not available (the rest are already installed), maybe you need to `M-x package-refresh-contents'. 
+                  Not available: %s" difference (cl-set-difference not-installed available))
+		  '(message "Packages that are not available: %d (the rest is already installed), maybe you need to `M-x package-refresh-contents'"
+			    difference)))
+
+;;mw The package built-in is more full featured than other hand written workarounds.
 (package-install-selected-packages)
 ; (unless (package-installed-p 'use-package)
 ;  (package-refresh-contents)
@@ -225,7 +245,7 @@ There are two things you can do about this warning:
 (use-package spaceline)
 (use-package spaceline-all-the-icons
   :after spaceline
-  :init (spaceline-all-the-icons-theme))
+  :config (spaceline-all-the-icons-theme))
 ;; (spaceline-emacs-theme)
 ;; (spaceline-spacemacs-theme)
 
@@ -278,6 +298,7 @@ There are two things you can do about this warning:
 ;; Spring Boot helper
 (require 'lsp-java-boot)
 
+;; https://github.com/bizzyman/LSP-Symbol-Outline
 (add-to-list 'load-path (expand-file-name "elisp/LSP-Symbol-Outline" user-emacs-directory))
 (require 'lsp-symbol-outline)
 (defun lsp-symbol-outline-create-conditional ()
@@ -344,6 +365,10 @@ There are two things you can do about this warning:
   (add-hook #'log4j-mode-hook #'view-mode)
   (add-hook #'log4j-mode-hook #'read-only-mode)
   (add-hook #'log4j-mode-hook 'eos/turn-on-hl-line))
+
+(add-to-list 'auto-mode-alist '("\\debug.txt\\'" . logview-mode))
+(add-to-list 'auto-mode-alist '("\\Appmaster.std\\'" . logview-mode))
+
 
 ;;  (progn
 ;;    (setq initial-frame-alist '( (tool-bar-lines . 0)))
@@ -497,3 +522,4 @@ There are two things you can do about this warning:
 
 ;; Automatically inserted by emacs
 (put 'scroll-left 'disabled nil)
+

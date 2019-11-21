@@ -14,8 +14,12 @@ export ALTERNATE_EDITOR=""
 export EDITOR="emacsclient -t"                  # $EDITOR opens in terminal
 export VISUAL="emacsclient -c -a emacs"         # $VISUAL opens in GUI mode
 
-#mw colorize ls output on Mac
-export CLICOLOR=1
+if $darwin; then
+    #mw colorize ls output on Mac
+    export CLICOLOR=1
+    # pathprepend "/Applications/Aquamacs.app/Contents/MacOS/bin"
+    pathprepend "/Applications/Emacs.app/Contents/MacOS/bin"
+fi
 
-# pathprepend "/Applications/Aquamacs.app/Contents/MacOS/bin"
-pathprepend "/Applications/Emacs.app/Contents/MacOS/bin"
+# 2019-11-20 experiment with better antialiasing and give hadoop native libraries
+export _JAVA_OPTIONS="-Djava.library.path=${HADOOP_HOME}/lib/native/ -Dawt.useSystemAAFontSettings=on"
