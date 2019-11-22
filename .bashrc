@@ -26,7 +26,7 @@ done
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-for SUBFILE in completion aliases; do
+for SUBFILE in completion aliases lattice-aliases; do
     [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 done
 
