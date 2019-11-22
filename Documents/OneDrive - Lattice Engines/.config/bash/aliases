@@ -1,0 +1,44 @@
+#   -*- shell-script -*-
+
+alias ec="emacsclient -n"
+alias p=pushd
+alias pp=popd
+
+
+alias dirs='echo -en "$GRAY"; dirs -v; echo -en "$OFF"'
+
+alias jfind="find . -name \*.java -type f | xargs grep -i "
+alias xfind="find . -name pom.xml -type f | xargs grep -i "
+
+# better safe than sorry
+alias rm="rm -i"
+alias mv="mv -i"
+alias cp="cp -i"
+
+alias showpath='echo $PATH | tr : "\n"'
+
+# Mac OS X specific aliases
+if $darwin; then
+   alias ldd="otool -L"
+   hash gdircolors 2>/dev/null && alias dircolors=gdircolors
+   hash gsort 2>/dev/null && alias sort=gsort
+   # bash 2.04 or later syntax
+   alias clear-scrollback=$'/usr/bin/osascript -e \'tell application "System Events" to tell process "Terminal" to keystroke "k" using command down\''
+   #' <- help emacs font-lock
+fi
+
+# Use GNU ls on macOS instead of BSD
+hash gls 2>/dev/null && LS="gls" || LS="ls"
+
+# Listing directory contents
+alias ls='LC_COLLATE=C '$LS' --color=auto --group-directories-first'
+alias l='ls -CFa'
+alias ll='ls -alF'
+alias lsd='ls -Gal | grep ^d'
+unset LS
+
+# From https://www.atlassian.com/git/tutorials/dotfiles
+# git init --bare $HOME/.cfg
+alias config='GIT_AUTHOR_EMAIL=$HOME_EMAIL /usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME' 
+# config config --local status.showUntrackedFiles no
+
