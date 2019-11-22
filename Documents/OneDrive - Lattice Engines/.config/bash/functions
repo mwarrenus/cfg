@@ -17,25 +17,26 @@ esac
 
 # ansi sequence ESC[<bold>;<fore>;<back>m where
 # csi = control sequence introduction, ESC-[, \e[, \033[
-   csi='\e['
-  GRAY="${csi}0;37m"
-   RED="${csi}0;31m"
-YELLOW="${csi}0;33m"
- GREEN="${csi}0;32m"
-  CYAN="${csi}0;36m"
-  BLUE="${csi}0;34m"
+   csi	='\e['
+  GRAY	="${csi}0;37m"
+   RED	="${csi}0;31m"
+YELLOW	="${csi}0;33m"
+ GREEN	="${csi}0;32m"
+  CYAN	="${csi}0;36m"
+  BLUE	="${csi}0;34m"
+OCHRE	="${csi}38;5;95m"
 
-  BGRAY="${csi}1;37m"
-   BRED="${csi}1;31m"
- BGREEN="${csi}1;32m"
+    BRED="${csi}1;31m"
+  BGREEN="${csi}1;32m"
  BYELLOW="${csi}1;33m"
- B34="${csi}1;34m"
-  BCYAN="${csi}1;36m"
-  BBLUE="${csi}1;34;57m"
-  UNDL="${csi}4m"
-     FRAME="${csi}4;53m"
-    OFF="${csi}0m"
- Y_ON_B="${csi}8;37;44m"
+   BBLUE="${csi}1;34m"
+BMAGENTA="${csi}1;35m"
+   BCYAN="${csi}1;36m"
+   BGRAY="${csi}1;37m"
+    UNDL="${csi}4m"
+   FRAME="${csi}4;53m"
+    OFF	="${csi}0m"
+ Y_ON_B	="${csi}8;37;44m"
 
 
 ### https://superuser.com/questions/39751/
@@ -76,6 +77,20 @@ pathdelete() {
     PATH="${a[*]}"
 }    
 
+function git_color {
+  local git_status="$(git status 2> /dev/null)"
+
+  if [[ ! $git_status =~ "working tree clean" ]]; then
+    echo -e $RED
+  elif [[ $git_status =~ "Your branch is ahead of" ]]; then
+    echo -e $YELLOW
+  elif [[ $git_status =~ "nothing to commit" ]]; then
+    echo -e $GREEN
+  else
+    echo -e $OCHRE
+  fi
+}
+
 parse_git_branch() {
   git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
@@ -114,7 +129,7 @@ cd() {
 # Right side prompt experiments
 
 # For ref. from lattice. Backslash dollar gets '#' for root.
-export PS1='\[\e[37m\]\u@\h\[\e[0m\]\[\e[32m\]$(parse_git_branch)\[\e[0m\] \[\e[37m\$ '
+export PS1='\[\e[0;4;37m\]\u@\h\[\e[0m\]\[$(git_color)\]$(parse_git_branch)\[\e[0m\] \[\e[37m\]\$ \[\e[1;37m\]'
 
 # pre_exec(){
 #     echo "Do something."
@@ -167,7 +182,7 @@ pwd_len(){
     fi
 }
 PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[\$(pwd_len)D${PS1RHS}${Rest}\]${PS1}"
-echo "PS1=$PS1"
+#debug echo "PS1=$PS1"
 
 # }
 # PROMPT_COMMAND=print_pre_prompt

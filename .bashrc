@@ -21,7 +21,7 @@ for SUBFILE in functions exports secrets lattice; do
 done
 
 #mw Confusing. Add bashrc, inputrc back into the list above if we find a need.
-# [ -r "$XDG_CONFIG_HOME/bash/functions" ] && . "$XDG_CONFIG_HOME/bash/bashrc"
+# [ -r "$XDG_CONFIG_HOME/bash/inputrc" ] && . "$XDG_CONFIG_HOME/bash/inputrc"
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
