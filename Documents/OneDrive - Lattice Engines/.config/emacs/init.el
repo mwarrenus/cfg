@@ -352,6 +352,26 @@ There are two things you can do about this warning:
 ;; https://github.com/kiwanami/emacs-calfw
 (require 'calfw)
 
+;; Unicode characters
+;; (setq cfw:fchar-junction ?╋
+;;       cfw:fchar-vertical-line ?┃
+;;       cfw:fchar-horizontal-line ?━
+;;       cfw:fchar-left-junction ?┣
+;;       cfw:fchar-right-junction ?┫
+;;       cfw:fchar-top-junction ?┳	
+;;       cfw:fchar-top-left-corner ?┏
+;;       cfw:fchar-top-right-corner ?┓)
+
+;; Another unicode chars
+;; (setq cfw:fchar-junction ?╬
+;;       cfw:fchar-vertical-line ?║
+;;       cfw:fchar-horizontal-line ?═
+;;       cfw:fchar-left-junction ?╠
+;;       cfw:fchar-right-junction ?╣
+;;       cfw:fchar-top-junction ?╦
+;;       cfw:fchar-top-left-corner ?╔
+;;       cfw:fchar-top-right-corner ?╗)
+
 (defun sqlparse-region (beg end)
   (interactive "r")
   (shell-command-on-region

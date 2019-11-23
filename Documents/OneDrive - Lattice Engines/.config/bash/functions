@@ -17,14 +17,14 @@ esac
 
 # ansi sequence ESC[<bold>;<fore>;<back>m where
 # csi = control sequence introduction, ESC-[, \e[, \033[
-   csi	='\e['
-  GRAY	="${csi}0;37m"
-   RED	="${csi}0;31m"
-YELLOW	="${csi}0;33m"
- GREEN	="${csi}0;32m"
-  CYAN	="${csi}0;36m"
-  BLUE	="${csi}0;34m"
-OCHRE	="${csi}38;5;95m"
+   csi='\e['
+  GRAY="${csi}0;37m"
+   RED="${csi}0;31m"
+YELLOW="${csi}0;33m"
+ GREEN="${csi}0;32m"
+  CYAN="${csi}0;36m"
+  BLUE="${csi}0;34m"
+OCHRE="${csi}38;5;95m"
 
     BRED="${csi}1;31m"
   BGREEN="${csi}1;32m"
@@ -35,8 +35,8 @@ BMAGENTA="${csi}1;35m"
    BGRAY="${csi}1;37m"
     UNDL="${csi}4m"
    FRAME="${csi}4;53m"
-    OFF	="${csi}0m"
- Y_ON_B	="${csi}8;37;44m"
+     OFF="${csi}0m"
+  Y_ON_B="${csi}8;37;44m"
 
 
 ### https://superuser.com/questions/39751/
@@ -77,7 +77,7 @@ pathdelete() {
     PATH="${a[*]}"
 }    
 
-function git_color {
+git_color() {
   local git_status="$(git status 2> /dev/null)"
 
   if [[ ! $git_status =~ "working tree clean" ]]; then
@@ -125,16 +125,20 @@ cd() {
 }
 
 
-
 # Right side prompt experiments
 
-# For ref. from lattice. Backslash dollar gets '#' for root.
-export PS1='\[\e[0;4;37m\]\u@\h\[\e[0m\]\[$(git_color)\]$(parse_git_branch)\[\e[0m\] \[\e[37m\]\$ \[\e[1;37m\]'
+export PS1='\[\e[0;4;37m\]\u@\h\[\e[0;36m\] \W\[$(git_color)\]$(parse_git_branch)\[\e[0m\] \[\e[37m\]\$ \[\e[1;37m\]'
+export PROMPT_DIRTRIM=5
 
+# PS0 is evaluated just before a command is run.
+# It could be used like this:
+#
 # pre_exec(){
 #     echo "Do something."
 # }
 # export PS0='$(pre_exec)\[\e[0m\]'
+#
+# but it's merely resetting the text color here.
 export PS0='\[\e[0m\]'
 
 # pre_prompt() {
@@ -150,8 +154,8 @@ export PS0='\[\e[0m\]'
 # Create a string like:  "[ Apr 25 16:06 ]" with time in RED.
 # printf -v PS1RHS "\e[0m[ \e[0;1;31m%(%b %d %H:%M)T \e[0m]" -1 # -1 is current time
 
-# Working directory
-printf -v PS1RHS "\\[${GRAY}\\w${OFF}\\]"
+# Working directory. Square brackets handled below.
+printf -v PS1RHS "${GRAY}\\w${OFF}"
 
 # Strip ANSI commands before counting length
 # From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
@@ -161,7 +165,7 @@ PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
 # local Save='\e[s' # Save cursor position
 # local Rest='\e[u' # Restore cursor to save point
 Save='\e[s' # Save cursor position
-Rest='\e[u' # Restore cursor to save point
+Restore='\e[u' # Restore cursor to save point
 
 # Save cursor position, jump to right hand edge, then go left N columns where
 # N is the length of the printable RHS string. Print the RHS string, then
@@ -174,14 +178,37 @@ Rest='\e[u' # Restore cursor to save point
 # CSI n D - move cursor back
 #mw orig PS1
 # PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
-pwd_len(){
-    if [[ "$PWD" =~ "${HOME}" ]]; then
-	echo $(expr ${#PWD} - ${#HOME} + 1);
-    else
-	echo ${#PWD}
+
+pwd_len() {
+    # substitute tilde for $HOME if it's there
+    p=${PWD/#$HOME/\~}
+#    echo "p=$p . PWD=$PWD"
+    local IFS='/'
+    t=($p)
+    n=${#t[*]}
+#    echo "found n=$n parts in $p . Split it into ${t[@]}"
+    if [[ n -gt $PROMPT_DIRTRIM ]]; then
+#	echo "fixin stuff"
+	# put tilde back if needed. Element 0 is nil when path starts with /
+	p="${t[0]:+${t[0]}/}..."
+	for ((i=n-$PROMPT_DIRTRIM;i<n;i++)); do
+	    p+="/${t[i]}"
+	done
+#	echo "rebuilt is ${#p} chars long: $p"
     fi
+    echo ${#p}
 }
-PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[\$(pwd_len)D${PS1RHS}${Rest}\]${PS1}"
+
+# pwd_len(){
+#     if [[ "$PWD" =~ "${HOME}" ]]; then
+# 	echo $(expr ${#PWD} - ${#HOME} + 1);
+#     else
+# 	echo ${#PWD}
+#     fi
+# }
+
+
+PS1="\[${Save}${csi}\${COLUMNS:-\$(tput cols)}C${csi}\$(pwd_len)D${PS1RHS}${Restore}\]${PS1}"
 #debug echo "PS1=$PS1"
 
 # }
