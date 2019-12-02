@@ -42,3 +42,6 @@ unset LS
 alias config='GIT_AUTHOR_EMAIL=$HOME_EMAIL /usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME' 
 # config config --local status.showUntrackedFiles no
 
+# zoonavigator - from Jignesh
+# docker run -d --network host -e HTTP_PORT=9009 --name zoonavigator --restart unless-stopped elkozmon/zoonavigator:latest
+alias dk-zoonav='docker start zoonavigator'

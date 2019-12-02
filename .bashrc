@@ -30,3 +30,8 @@ for SUBFILE in completion aliases lattice-aliases; do
     [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 done
 
+if [[ $ITERM_PROGRAM = "iTerm.app" ]]; then
+    SUBFILE=iterm2_shell_integration.bash
+    [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
+fi
+

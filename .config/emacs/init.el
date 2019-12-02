@@ -352,7 +352,17 @@ There are two things you can do about this warning:
 ;; https://github.com/kiwanami/emacs-calfw
 (require 'calfw)
 
-;; Unicode characters
+;; Unicode thin
+;; (setq cfw:fchar-horizontal-line 9472
+;;       cfw:fchar-junction 9532
+;;       cfw:fchar-left-junction 9500
+;;       cfw:fchar-right-junction 9508
+;;       cfw:fchar-top-junction 9516
+;;       cfw:fchar-top-left-corner 9581
+;;       cfw:fchar-top-right-corner 9582
+;;       cfw:fchar-vertical-line 9474)
+
+;; Unicode characters thick
 ;; (setq cfw:fchar-junction ?╋
 ;;       cfw:fchar-vertical-line ?┃
 ;;       cfw:fchar-horizontal-line ?━
@@ -362,7 +372,7 @@ There are two things you can do about this warning:
 ;;       cfw:fchar-top-left-corner ?┏
 ;;       cfw:fchar-top-right-corner ?┓)
 
-;; Another unicode chars
+;; Another unicode chars double lines
 ;; (setq cfw:fchar-junction ?╬
 ;;       cfw:fchar-vertical-line ?║
 ;;       cfw:fchar-horizontal-line ?═

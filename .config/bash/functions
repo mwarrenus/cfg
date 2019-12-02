@@ -17,12 +17,14 @@ esac
 
 # ansi sequence ESC[<bold>;<fore>;<back>m where
 # csi = control sequence introduction, ESC-[, \e[, \033[
-   csi='\e['
-  GRAY="${csi}0;37m"
+   csi="\e["
+   GRAY="${csi}0;37m"
+   GRAY="$(tput setaf 7)"
    RED="${csi}0;31m"
 YELLOW="${csi}0;33m"
  GREEN="${csi}0;32m"
-  CYAN="${csi}0;36m"
+# CYAN="${csi}0;36m"
+ CYAN="$(tput setaf 6)"
   BLUE="${csi}0;34m"
 OCHRE="${csi}38;5;95m"
 
@@ -32,12 +34,17 @@ OCHRE="${csi}38;5;95m"
    BBLUE="${csi}1;34m"
 BMAGENTA="${csi}1;35m"
    BCYAN="${csi}1;36m"
-   BGRAY="${csi}1;37m"
+   #   BGRAY="${csi}1;37m"
+   BGRAY="$(tput setab 7)"
+   
     UNDL="${csi}4m"
    FRAME="${csi}4;53m"
-     OFF="${csi}0m"
+   #     OFF="${csi}0m"
+   OFF="$(tput sgr0)"
   Y_ON_B="${csi}8;37;44m"
-
+  ULON="$(tput smul)"
+  ULOFF="$(tput rmul)"
+  
 
 ### https://superuser.com/questions/39751/
 #mw Skip the directory existence check during setup phase; some directories are getting created
@@ -92,7 +99,7 @@ git_color() {
 }
 
 parse_git_branch() {
-  git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
 }
 
 # from https://thrysoee.dk/pushd/
@@ -127,11 +134,105 @@ cd() {
 
 # Right side prompt experiments
 
-export PS1='\[\e[0;4;37m\]\u@\h\[\e[0;36m\] \W\[$(git_color)\]$(parse_git_branch)\[\e[0m\] \[\e[37m\]\$ \[\e[1;37m\]'
+# Right-aligned working directory
+# https://superuser.com/questions/187455/right-align-part-of-prompt/1203400#1203400
+
+# Create a string like:  "[ Apr 25 16:06 ]" with time in RED.
+# printf -v PS1RHS "\e[0m[ \e[0;1;31m%(%b %d %H:%M)T \e[0m]" -1 # -1 is current time
+
+# Working directory. Outer square brackets handled below.
+PS1RHS='\[$CYAN\]\w\[$OFF\]'
+
+# Strip ANSI commands before counting length
+# From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
+PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
+
+# Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
+# local Save='\e[s' # Save cursor position
+# local Rest='\e[u' # Restore cursor to save point
+# Save='\e[s' # Save cursor position
+# Restore='\e[u' # Restore cursor to save point
+# Use tput instead of hardcoding \e[s and \e[u to appease Terminal.app 
+Save=$(tput sc)
+Restore=$(tput rc)
+
+# Calculate length of \w component (using for right side prompt)
+pwd_string() {
+    # substitute tilde for $HOME if it's there
+    p=${PWD/#$HOME/\~}
+#    echo "p=$p . PWD=$PWD"
+    local IFS='/'
+    t=($p)
+    n=${#t[*]}
+    #    echo "found n=$n parts in $p . Split it into ${t[@]}"
+    unset IFS
+    if [[ n -gt $PROMPT_DIRTRIM ]]; then
+#	echo "fixin stuff"
+	# put tilde back if needed. Element 0 is nil when path starts with /
+	p="${t[0]:+${t[0]}/}..."
+	for ((i=n-$PROMPT_DIRTRIM;i<n;i++)); do
+	    p+="/${t[i]}"
+	done
+	echo "rebuilt is ${#p} chars long: $p"
+    fi
+    echo ${p}
+}
+
+pwd_len() {
+    p=$(pwd_string)
+    echo ${#p}
+}
+
+# pwd_len(){
+#     if [[ "$PWD" =~ "${HOME}" ]]; then
+# 	echo $(expr ${#PWD} - ${#HOME} + 1);
+#     else
+# 	echo ${#PWD}
+#     fi
+# }
+
+function iterm2_print_user_vars() {
+  iterm2_set_user_var gitBranch $(parse_git_branch)
+}
+
+if [[ $ITERM_SHELL_INTEGRATION_INSTALLED = "Yes" ]]; then
+    # https://iterm2.com/documentation-badges.html
+    printf -v IT2_BADGE "\e]1337;SetBadgeFormat=%s\a" \
+	   $(echo -n "\(user.gitBranch) " | base64)
+    PS1RHS=$IT2_BADGE
+else
+    #  $csi is broken. Hard coding it works (see next).
+    # PS1RHS='\[$Save$ULON$csi${COLUMNS:-$(tput cols)}C$csi$(pwd_len)D$CYAN\]\w\[$OFF$Restore\]'
+    # works, crampped space tho'.
+    # PS1RHS='\[$Save\e[${COLUMNS:-$(tput cols)}C\e[$(pwd_len)D$ULON\]\w\[$OFF$Restore\]'
+    printf -v PS1RHS "\[\e]7;\\\u@\h:\w\a\]"
+fi
+	
+	
+
 export PROMPT_DIRTRIM=5
 
+
+# Save cursor position, jump to right hand edge, then go left N columns where
+# N is the length of the printable RHS string. Print the RHS string, then
+# return to the saved position and print the LHS prompt.
+# Note: "\[" and "\]" are used so that bash can calculate the number of
+# printed characters so that the prompt doesn't do strange things when
+# editing the entered text.
+# CSI n C - move cursor forward
+# CSI n D - move cursor back
+# orig PS1
+# PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
+#
+# more experiments
+# PS1="\[${Save}${csi}\${COLUMNS:-\$(tput cols)}C${csi}\$(pwd_len)D${PS1RHS}${Restore}\]${PS1}"
+
+export PS1='\[$ULON$GRAY\]\u@\h\[$OFF$CYAN\] \W\[$(git_color)\]$(parse_git_branch)\[$OFF\] \[\e[37m\]\$ \[\e[1;37m\]'
+export PS1="$PS1RHS$PS1"
+#debug echo "PS1=$PS1"
+
 # PS0 is evaluated just before a command is run.
-# It could be used like this:
+# It could be used like this to run a function:
 #
 # pre_exec(){
 #     echo "Do something."
@@ -148,68 +249,7 @@ export PS0='\[\e[0m\]'
 # PROMPT_COMMAND=pre_prompt
 
 # print_pre_prompt(){
-# Right-aligned working directory
-# https://superuser.com/questions/187455/right-align-part-of-prompt/1203400#1203400
 
-# Create a string like:  "[ Apr 25 16:06 ]" with time in RED.
-# printf -v PS1RHS "\e[0m[ \e[0;1;31m%(%b %d %H:%M)T \e[0m]" -1 # -1 is current time
-
-# Working directory. Square brackets handled below.
-printf -v PS1RHS "${GRAY}\\w${OFF}"
-
-# Strip ANSI commands before counting length
-# From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
-PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
-
-# Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
-# local Save='\e[s' # Save cursor position
-# local Rest='\e[u' # Restore cursor to save point
-Save='\e[s' # Save cursor position
-Restore='\e[u' # Restore cursor to save point
-
-# Save cursor position, jump to right hand edge, then go left N columns where
-# N is the length of the printable RHS string. Print the RHS string, then
-# return to the saved position and print the LHS prompt.
-
-# Note: "\[" and "\]" are used so that bash can calculate the number of
-# printed characters so that the prompt doesn't do strange things when
-# editing the entered text.
-# CSI n C - move cursor forward
-# CSI n D - move cursor back
-#mw orig PS1
-# PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
-
-pwd_len() {
-    # substitute tilde for $HOME if it's there
-    p=${PWD/#$HOME/\~}
-#    echo "p=$p . PWD=$PWD"
-    local IFS='/'
-    t=($p)
-    n=${#t[*]}
-#    echo "found n=$n parts in $p . Split it into ${t[@]}"
-    if [[ n -gt $PROMPT_DIRTRIM ]]; then
-#	echo "fixin stuff"
-	# put tilde back if needed. Element 0 is nil when path starts with /
-	p="${t[0]:+${t[0]}/}..."
-	for ((i=n-$PROMPT_DIRTRIM;i<n;i++)); do
-	    p+="/${t[i]}"
-	done
-#	echo "rebuilt is ${#p} chars long: $p"
-    fi
-    echo ${#p}
-}
-
-# pwd_len(){
-#     if [[ "$PWD" =~ "${HOME}" ]]; then
-# 	echo $(expr ${#PWD} - ${#HOME} + 1);
-#     else
-# 	echo ${#PWD}
-#     fi
-# }
-
-
-PS1="\[${Save}${csi}\${COLUMNS:-\$(tput cols)}C${csi}\$(pwd_len)D${PS1RHS}${Restore}\]${PS1}"
-#debug echo "PS1=$PS1"
 
 # }
 # PROMPT_COMMAND=print_pre_prompt
