@@ -351,6 +351,7 @@ There are two things you can do about this warning:
 
 ;; https://github.com/kiwanami/emacs-calfw
 (require 'calfw)
+(require 'calfw-cal) ;; for diary entries
 
 ;; Unicode thin
 ;; (setq cfw:fchar-horizontal-line 9472
