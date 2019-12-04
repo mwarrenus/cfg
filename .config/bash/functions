@@ -227,7 +227,7 @@ export PROMPT_DIRTRIM=5
 # more experiments
 # PS1="\[${Save}${csi}\${COLUMNS:-\$(tput cols)}C${csi}\$(pwd_len)D${PS1RHS}${Restore}\]${PS1}"
 
-export PS1='\[$ULON$GRAY\]\u@\h\[$OFF$CYAN\] \W\[$(git_color)\]$(parse_git_branch)\[$OFF\] \[\e[37m\]\$ \[\e[1;37m\]'
+export PS1='\[$OFF$ULON$GRAY\]\u@\h\[$OFF$CYAN\] \W\[$(git_color)\]$(parse_git_branch)\[$OFF\] \[\e[37m\]\$ \[\e[1;37m\]'
 export PS1="$PS1RHS$PS1"
 #debug echo "PS1=$PS1"
 
