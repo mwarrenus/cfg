@@ -1,4 +1,5 @@
 #   -*- shell-script -*-
+[ $DEBUG ] && echo "in aliases"
 
 alias ec="emacsclient -n"
 alias p=pushd

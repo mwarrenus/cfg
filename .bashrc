@@ -1,4 +1,10 @@
 #   -*- shell-script -*-
+# .bashrc is executed for interactive, non-login shells
+# .bash_profile is executed for login shells
+# (MacOS Terminal.app runs a login shell for for each new terminal window.)
+
+# DEBUG=1
+[ $DEBUG ] && echo "in .bashrc"
 
 # Default PATH to something useable
 export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
@@ -26,12 +32,12 @@ done
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
-for SUBFILE in completion aliases lattice-aliases; do
+for SUBFILE in completion aliases prompt lattice-aliases; do
     [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 done
 
 if [[ $ITERM_PROGRAM = "iTerm.app" ]]; then
     SUBFILE=iterm2_shell_integration.bash
-    [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
+    [[ -f "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 fi
 

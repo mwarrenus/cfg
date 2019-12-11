@@ -1,12 +1,13 @@
 #   -*- shell-script -*-
+[ $DEBUG ] && echo "in completion"
 
 # This loads nvm bash_completion
 [ -s "$NVM_HOME/etc/bash_completion" ] && . "$NVM_HOME/etc/bash_completion"
 
 # fast:
 # git completion 
-if [ -r "$(git --exec-path)../etc/bash_completion.d/git-completion.bash" ]; then
-	. "$(git --exec-path)../etc/bash_completion.d/git-completion.bash"
+if [ -r "$(git --exec-path)/../../etc/bash_completion.d/git-completion.bash" ]; then
+	. "$(git --exec-path)/../../etc/bash_completion.d/git-completion.bash"
 fi
 
 # from https://docs.brew.sh/Shell-Completion

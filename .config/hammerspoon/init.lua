@@ -1,5 +1,8 @@
 -- defaults write org.hammerspoon.Hammerspoon MJConfigFile "~/.config/hammerspoon/init.lua"
-hs.loadSpoon('Calendar');
+hs.loadSpoon('Calendar')
+-- from https://github.com/jasonrudolph/ControlEscape.spoon
+-- hs.loadSpoon('ControlEscape'):start() 
+local ctrlTap = require('ctrlTap'); -- simpler version
 
 -- http://www.hammerspoon.org/go/#simplemenubar
 caffeine = hs.menubar.new()

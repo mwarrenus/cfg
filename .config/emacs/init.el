@@ -1,5 +1,45 @@
-; (setq debug-on-error 't)
+;; Debugging helpers
+;; (setq debug-on-error 't)
+;; (check-parens)
 
+;; Benchmarking Suggestions
+;; http://qsdfgh.com/articles/2016/11/02/emacs-loading-time.html
+;; Display the total loading time in the minibuffer
+;; (defun display-startup-echo-area-message ()
+;;   "Display startup echo area message."
+;;   (message "Initialized in %s" (emacs-init-time)))
+;; ;; Benchmark loading time file by file and display it in the *Messages* buffer
+;; (when init-file-debug
+;;   (require 'benchmark))
+
+;; (if init-file-debug
+;;     (message "Feature '%s' loaded in %.2fs" feat
+;; 	     (benchmark-elapse (require feat fname))))
+
+;; alternate
+;;  https://emacs.stackexchange.com/questions/539/how-do-i-measure-performance-of-elisp-code
+;; (defmacro with-timer (title &rest forms)
+;;   "Run the given FORMS, counting the elapsed time.
+;; A message including the given TITLE and the corresponding elapsed
+;; time is displayed."
+;;   (declare (indent 1))
+;;   (let ((nowvar (make-symbol "now"))
+;;         (body   `(progn ,@forms)))
+;;     `(let ((,nowvar (current-time)))
+;;        (message "%s..." ,title)
+;;        (prog1 ,body
+;;          (let ((elapsed
+;;                 (float-time (time-subtract (current-time) ,nowvar))))
+;;            (message "%s... done (%.3fs)" ,title elapsed))))))
+;; Example use:
+;; (with-timer "Doing things"
+;;  (form (to (be evaluated))))
+
+;; Best profiling!
+;; emacs -Q -l ~/.config/emacs/elisp/profile-dotemacs.el -f profile-dotemacs
+
+
+;; 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -50,7 +90,7 @@
      ("FIXME" . "#dc752f")
      ("XXX+" . "#dc752f")
      ("\\?\\?\\?+" . "#dc752f"))))
- '(ivy-mode nil)
+ '(ivy-mode 't)
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
@@ -64,7 +104,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line)))
+    (calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
  '(package-user-dir "~/lib/elpa")
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
  '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
@@ -110,7 +150,7 @@
  '(logview-information-entry ((t (:background "#002500"))))
  '(parenthesis ((t (:inherit shadow :foreground "dim gray")))))
 
-
+
 (package-initialize) ;; make sure 'package-archives is defined to pass member check w/o void-variable err
 
 ;; Melpa - https://melpa.org/#/getting-started with a detailed function handling httpS
@@ -144,90 +184,110 @@ There are two things you can do about this warning:
 (setq use-package-compute-statistics t
       use-package-always-ensure t)
 
-;;mw Redefine to show missing packages when difference > 0
-;; from lisp/elisp/package.el
-(require 'advice-patch)
+;; Only install packages if the --install-pkgs command line argument is passed to emacs.
+(defun found-custom-arg (switch)
+  (let ((found-switch (member switch command-line-args)))
+    (setq command-line-args (delete switch command-line-args))
+    found-switch))
 
-(with-demoted-errors "Error in advice-patch of package-install-selected-packages: %S"
-    (advice-patch 'package-install-selected-packages
-		  '(message "%d packages are not available (the rest are already installed), maybe you need to `M-x package-refresh-contents'. 
+(if (found-custom-arg "--install-pkgs")
+    ;;mw Advise/redefine to show missing packages when difference > 0
+    ;; from lisp/elisp/package.el
+    (progn
+      (require 'advice-patch)
+      (with-demoted-errors "Error in advice-patch of package-install-selected-packages: %S"
+	(advice-patch 'package-install-selected-packages
+		      '(message "%d packages are not available (the rest are already installed); maybe you need to `M-x package-refresh-contents'. 
                   Not available: %s" difference (cl-set-difference not-installed available))
-		  '(message "Packages that are not available: %d (the rest is already installed), maybe you need to `M-x package-refresh-contents'"
-			    difference)))
+		      '(message "Packages that are not available: %d (the rest is already installed), maybe you need to `M-x package-refresh-contents'"
+				difference)))
 
-;;mw The package built-in is more full featured than other hand written workarounds.
-(package-install-selected-packages)
-; (unless (package-installed-p 'use-package)
-;  (package-refresh-contents)
-;  (package-install 'use-package))
+      ;;mw The package built-in is more full featured than other hand written workarounds.
+      (package-refresh-contents)
+      (package-install-selected-packages)
+      ;; e.g. this is one hand written workaround:
+      ;; (unless (package-installed-p 'use-package)
+      ;;  (package-refresh-contents)
+      ;;  (package-install 'use-package))
+
+      )
+  )
+
 (require 'use-package)
 
-
 ;; Helm - partially from emacs-helm.sh
-;;mw NB: Just set helm-mode on using Customize for the default experience
-
+;;mw NB: Just turn on helm-mode using Customize for the default experience
+;;mw removed from package-selected packages:  ace-jump-helm-line
+;; (add-hook 'helm-mode-hook ()
 (use-package helm
-  :init
-  (setq helm-flx-for-helm-find-files t)
-  :config
-  (helm-mode 1)
-  (helm-flx-mode 1)
-  (define-key global-map [remap find-file] 'helm-find-files)
-  (define-key global-map [remap occur] 'helm-occur)
-;  (define-key global-map [remap list-buffers] 'helm-buffers-list)
-  (define-key global-map [remap dabbrev-expand] 'helm-dabbrev)
-  (define-key global-map [remap execute-extended-command] 'helm-M-x)
-  (define-key global-map [remap apropos-command] 'helm-apropos)
+  :disabled
+  :bind
+  ([remap find-file] . 'helm-find-files)
+  ([remap occur] . 'helm-occur)
+; ([remap list-buffers] . 'helm-buffers-list)
+  ([remap dabbrev-expand] . 'helm-dabbrev)
+  ([remap execute-extended-command] . 'helm-M-x)
+  ([remap apropos-command] . 'helm-apropos)
 ; https://emacs.stackexchange.com/questions/33727/how-does-spacemacs-allow-tab-completion-in-helm  
-  (define-key helm-map (kbd "TAB") #'helm-execute-persistent-action)
-  (define-key helm-map (kbd "<tab>") #'helm-execute-persistent-action)
-  (define-key helm-map (kbd "C-z") #'helm-select-action)
+  ("TAB" . #'helm-execute-persistent-action)
+  ("<tab>" . #'helm-execute-persistent-action)
+  ("C-z" . #'helm-select-action)
+  :config
+  (setq helm-flx-for-helm-find-files t)
+  (helm-mode 0)
+  (helm-flx-mode 0)
   (unless (boundp 'completion-in-region-function)
     (define-key lisp-interaction-mode-map [remap completion-at-point] 'helm-lisp-completion-at-point)
-    (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point))
+    (define-key emacs-lisp-mode-map       [remap completion-at-point] 'helm-lisp-completion-at-point)
+    )
   )
 
 ;; Try Ivy/Swiper/Counsel
 ;; https://truthseekers.io/lessons/how-to-use-ivy-swiper-counsel-in-emacs-for-noobs/
-;; (setq ivy-use-virtual-buffers t)  ;; no idea, but recommended by project maintainer
-;; (setq enable-recursive-minibuffers t) ;; no idea, but recommended by project maintainer
-;; (setq ivy-count-format "(%d/%d) ")  ;; changes the format of the number of results
-;; (ivy-mode 1)
-;; (global-set-key (kbd "C-s") 'swiper)  ;; replaces i-search with swiper
-;; (global-set-key (kbd "M-x") 'counsel-M-x) ;; Gives M-x command counsel features
-;; (global-set-key (kbd "C-x C-f") 'counsel-find-file) ;; gives C-x C-f counsel features
-;; (global-set-key (kbd "<f1> f") 'counsel-describe-function)
-;; (global-set-key (kbd "<f1> v") 'counsel-describe-variable)
-;; (global-set-key (kbd "<f1> l") 'counsel-find-library)
-;; (global-set-key (kbd "<f2> i") 'counsel-info-lookup-symbol) 
-;; (global-set-key (kbd "<f2> u") 'counsel-unicode-char)  
-;; (global-set-key (kbd "C-c C-r") 'ivy-resume) 
- 
-;; (global-set-key (kbd "C-c g") 'counsel-git)
-;; (global-set-key (kbd "C-c j") 'counsel-git-grep)
-;; (global-set-key (kbd "C-c k") 'counsel-ag) ;; add counsel/ivy features to ag package
-;; (global-set-key (kbd "C-x l") 'counsel-locate)
-;; (global-set-key (kbd "C-S-o") 'counsel-rhythmbox)
-;; ;;(define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+(use-package ivy
+  :bind 
+  ("C-s" . swiper)  ;; replaces i-search with swiper
+  ("M-x" . counsel-M-x) ;; Gives M-x command counsel features
+  ("C-x C-f" . 'counsel-find-file) ;; gives C-x C-f counsel features
+  ("<f1> f" . 'counsel-describe-function)
+  ("<f1> v" . 'counsel-describe-variable)
+  ("<f1> l" . 'counsel-find-library)
+  ("<f2> i" . 'counsel-info-lookup-symbol) 
+  ("<f2> u" . 'counsel-unicode-char)  
+  ("C-c C-r" . 'ivy-resume) 
 
-;; ;;set action options during execution of counsel-find-file
-;; ;; replace "frame" with window to open in new window
-;; (ivy-set-actions
-;;  'counsel-find-file
-;;  '(("j" find-file-other-frame "other frame")
-;;    ("b" counsel-find-file-cd-bookmark-action "cd bookmark")
-;;    ("x" counsel-find-file-extern "open externally")
-;;    ("d" delete-file "delete")
-;;    ("r" counsel-find-file-as-root "open as root")))
- 
-;; ;; set actions when running C-x b
-;; ;; replace "frame" with window to open in new window
-;; (ivy-set-actions
-;;  'ivy-switch-buffer
-;;  '(("j" switch-to-buffer-other-frame "other frame")
-;;    ("k" kill-buffer "kill")
-;;    ("r" ivy--rename-buffer-action "rename")))
-;; end Ivy
+  ("C-c g" . counsel-git)
+  ("C-c j" . counsel-git-grep)
+  ("C-c k" . counsel-ag) ;; add counsel/ivy features to ag package
+  ("C-x l" . counsel-locate)
+  ("C-S-o" . counsel-rhythmbox)
+  ;;(define-key read-expression-map (kbd "C-r") 'counsel-expression-history)
+
+  ;;set action options during execution of counsel-find-file
+  ;; replace "frame" with window to open in new window
+  :config
+  (setq ivy-use-virtual-buffers t)  ;; no idea, but recommended by project maintainer
+  (setq enable-recursive-minibuffers t) ;; no idea, but recommended by project maintainer
+  (setq ivy-count-format "(%d/%d) ")  ;; changes the format of the number of results
+  (ivy-mode 1)
+  (ivy-set-actions
+   'counsel-find-file
+   '(("j" find-file-other-frame "other frame")
+     ("b" counsel-find-file-cd-bookmark-action "cd bookmark")
+     ("x" counsel-find-file-extern "open externally")
+     ("d" delete-file "delete")
+     ("r" counsel-find-file-as-root "open as root")))
+  
+  ;; set actions when running C-x b
+  ;; replace "frame" with window to open in new window
+  (ivy-set-actions
+   'ivy-switch-buffer
+   '(("j" switch-to-buffer-other-frame "other frame")
+     ("k" kill-buffer "kill")
+     ("r" ivy--rename-buffer-action "rename")))
+  )
+  ;; end Ivy
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; from https://stackoverflow.com/questions/13397737/ansi-coloring-in-compilation-mode
@@ -236,6 +296,7 @@ There are two things you can do about this warning:
 (defun my-colorize-compilation-buffer ()
   (when (eq major-mode 'compilation-mode)
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
 (add-hook 'compilation-filter-hook 'my-colorize-compilation-buffer)
 
 ;; from https://www.emacswiki.org/emacs/AnsiColor
@@ -247,22 +308,29 @@ There are two things you can do about this warning:
     (setq insert-directory-program "gls" dired-use-ls-dired t)
     ; for Fira Code font ligatures. https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
     (mac-auto-operator-composition-mode)
-    (exec-path-from-shell-initialize)))
+    (setq exec-path-from-shell-arguments 'nil)
+    (exec-path-from-shell-initialize)
+    )
+  )
 
 (use-package all-the-icons)
 ;;  :config
 ;;  (add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
 
-; (use-package powerline)
-; (powerline-default-theme)
+(use-package powerline
+  :config (powerline-default-theme))
 
-(use-package spaceline)
+(use-package spaceline
+  :disabled)
 (use-package spaceline-all-the-icons
+  :disabled
   :after spaceline
-  :config (spaceline-all-the-icons-theme))
+  :config (spaceline-all-the-icons-theme)
+  )
 ;; (spaceline-emacs-theme)
 ;; (spaceline-spacemacs-theme)
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Emacs Java developer tools
 ;;
@@ -274,10 +342,13 @@ There are two things you can do about this warning:
 ;;
 ;; LSP - Language Server Protocol. Newer, lighter weight option using the lsp protocol from Microsoft
 (use-package company-lsp
+   :defer
    :config
    (push 'company-lsp company-backends))
 
-(use-package flycheck)
+(use-package flycheck
+  :defer
+  )
 
 ;; Language Server Protocol
 (use-package lsp-mode
@@ -287,8 +358,14 @@ There are two things you can do about this warning:
 ;; Eclipse JDT LSP Server
 ;; https://github.com/emacs-lsp/lsp-java
 (use-package lsp-java
+  :defer
   :config
-  (add-hook 'java-mode-hook #'lsp-deferred))
+  (add-hook 'java-mode-hook #'lsp-deferred)
+  (add-hook 'java-mode-hook (lambda () (require 'lsp-java-boot)))
+  (with-eval-after-load 'lsp-java-boot
+    (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+    (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode))
+  )
 
 ;; intellij-lsp-server
 ;; from https://github.com/Ruin0x11/lsp-intellij
@@ -296,34 +373,48 @@ There are two things you can do about this warning:
 ;;  (require 'lsp-intellij)
 ;;  (add-hook 'java-mode-hook #'lsp-intellij-enable))
 
-(use-package lsp-ui
-   :config (progn
-	     (add-hook 'lsp-mode-hook 'lsp-ui-mode)
-	     (add-hook 'java-mode-hook 'flycheck-mode)))
-
-(define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
-(define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
-
-(require 'lsp-ui-flycheck)
-(with-eval-after-load 'lsp-mode
-  (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable 1))))
-
-(use-package magit)
-
-(use-package magit-find-file
-  :bind (:map global-map ("C-c p" .  'magit-find-file-completing-read)))
-
 ;; This isn't available in melpa/elpa and so I've stashed it locally 2019-10. Update when it's there.
 ;; Spring Boot helper
-(require 'lsp-java-boot)
-;; to enable the lenses
-(with-eval-after-load 'lsp-java-boot
-  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
-  (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode))
+;;mw Moved into java-mode-hook above
+;; (require 'lsp-java-boot)
+;; ;; to enable the lenses
+;; (with-eval-after-load 'lsp-java-boot
+;;  (add-hook 'lsp-mode-hook #'lsp-lens-mode)
+;;  (add-hook 'java-mode-hook #'lsp-java-boot-lens-mode))
+
+
+(use-package lsp-ui
+  :defer
+  :bind (:map lsp-ui-mode-map ([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
+	      ([remap xref-find-references] . #'lsp-ui-peek-find-references))
+  :config (progn
+	    (add-hook 'lsp-mode-hook 'lsp-ui-mode)
+	    (add-hook 'lsp-mode-hook (lambda () (require 'lsp-ui-flycheck)))
+	    (add-hook 'lsp-mode-hook (lambda () (require 'lsp-symbol-outline)))
+	    (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable 1)))
+	    (add-hook 'java-mode-hook 'flycheck-mode))
+  )
+;; moved to :bind above
+;;(define-key lsp-ui-mode-map [remap xref-find-definitions] #'lsp-ui-peek-find-definitions)
+;;(define-key lsp-ui-mode-map [remap xref-find-references] #'lsp-ui-peek-find-references)
+
+;; Moved into lsp-ui hooks
+;; (require 'lsp-ui-flycheck)
+;; (with-eval-after-load 'lsp-mode
+;;   (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable 1))))
+
+(use-package magit
+  :defer)
+
+(use-package magit-find-file
+  :defer
+  :bind ("C-c p" .  'magit-find-file-completing-read)
+  )
 
 
 ;; https://github.com/bizzyman/LSP-Symbol-Outline
-(require 'lsp-symbol-outline)
+;;mw move into lsp-mode-hook
+;; (require 'lsp-symbol-outline)
 (defun lsp-symbol-outline-create-conditional ()
     (interactive)
     (cond ((equal major-mode 'python-mode)
@@ -343,15 +434,18 @@ There are two things you can do about this warning:
            (lsp-symbol-outline-make-outline-js))
           ((equal major-mode 'java-mode)
            (lsp-symbol-outline-make-outline-java))))
+
+;; mode-specific-map is typically the "C-c" prefix map
 (define-key mode-specific-map "M-." 'lsp-symbol-outline-create-conditional)
 
 
 ;; END Java Dev't Env
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
 ;; https://github.com/kiwanami/emacs-calfw
-(require 'calfw)
-(require 'calfw-cal) ;; for diary entries
+(use-package calfw)
+(use-package calfw-cal) ;; for diary entries
 
 ;; Unicode thin
 ;; (setq cfw:fchar-horizontal-line 9472
@@ -527,7 +621,9 @@ There are two things you can do about this warning:
 (use-package treemacs-magit
   :after treemacs magit)
 
-(use-package treemacs-projectile)
+(use-package treemacs-projectile
+  :defer
+  )
 
 (use-package doom-themes
   :after treemacs
@@ -540,11 +636,28 @@ There are two things you can do about this warning:
     (doom-themes-org-config)
     )
 
+;; elisp stuff
 (use-package elisp-refs
   :commands (elisp-refs-function elisp-refs-macro elisp-refs-variable
              elisp-refs-special elisp-refs-symbol)
   :bind (:map lisp-mode-shared-map
 	      ("M-<f7>"   . elisp-refs-function))) ; like IntelliJ
+
+(defun xah-show-formfeed-as-line ()
+  "Display the formfeed ^L char as line.
+URL `http://ergoemacs.org/emacs/emacs_form_feed_section_paging.html'
+Version 2018-08-30"
+  (interactive)
+  ;; 2016-10-11 thanks to Steve Purcell's page-break-lines.el
+  (progn
+    (when (not buffer-display-table)
+      (setq buffer-display-table (make-display-table)))
+    (aset buffer-display-table ?\^L
+          (vconcat (make-list 70 (make-glyph-code ?─ 'font-lock-comment-face))))
+    (redraw-frame)))
+;; Xah's keys for moving to prev/next code section (Form Feed; ^L). Consistent with lisp nav
+(global-set-key (kbd "<C-M-prior>") 'backward-page) ; Ctrl+Alt+PageUp
+(global-set-key (kbd "<C-M-next>") 'forward-page)   ; Ctrl+Alt+PageDown
 
 (use-package projectile
   :ensure t
@@ -567,11 +680,12 @@ There are two things you can do about this warning:
 ;; (let (modes-not-to-save '(dired-mode tags-table-mode Info-mode
 ;;			  treemacs-mode info-lookup-mode fundamental-mode))
 
-;;(which-key-setup-side-window-right-bottom)
-(which-key-setup-minibuffer)
+(which-key-setup-side-window-right-bottom)
+;; (which-key-setup-minibuffer)
 
 (server-start)
 
 ;; Automatically inserted by emacs
 (put 'scroll-left 'disabled nil)
 
+(put 'narrow-to-page 'disabled nil)

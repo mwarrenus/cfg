@@ -1,0 +1,166 @@
+#   -*- shell-script -*-
+
+# DEBUG=1
+[ $DEBUG ] && echo "in prompt"
+
+# We're about to use terminfo a lot; let's use a newer TERMINFO db if available
+[[ -d /opt/conda/share/terminfo ]] && export TERMINFO=/opt/conda/share/terminfo
+pathprepend /opt/conda/bin
+
+# ansi sequence ESC[<bold>;<fore>;<back>m where
+# csi = control sequence introduction, ESC-[, \e[, \033[
+   csi="\e["
+
+# Not necessarily portable   
+#   GRAY="${csi}0;37m"
+#   RED="${csi}0;31m"
+#YELLOW="${csi}0;33m"
+# GREEN="${csi}0;32m"
+# CYAN="${csi}0;36m"
+#  BLUE="${csi}0;34m"
+#OCHRE="${csi}38;5;95m"
+
+# Use the tput command for portability. To see capnames, use infocmp
+   BLACK="$(tput setaf 0)"
+     RED="$(tput setaf 1)"
+   GREEN="$(tput setaf 2)"
+  YELLOW="$(tput setaf 3)"
+    BLUE="$(tput setaf 4)"
+ MAGENTA="$(tput setaf 5)"
+    CYAN="$(tput setaf 6)"
+    GRAY="$(tput setaf 7)"
+   OCHRE="${csi}38;5;95m"
+
+  BBLACK="$(tput setab 0)"
+    BRED="$(tput setab 1)"
+  BGREEN="$(tput setab 2)"
+ BYELLOW="$(tput setab 3)"
+   BBLUE="$(tput setab 4)"
+BMAGENTA="$(tput setab 5)"
+   BCYAN="$(tput setab 6)"
+   BGRAY="$(tput setab 7)"
+   
+#   BGRAY="${csi}1;37m"
+#    ULON="${csi}4m"
+   FRAME="${csi}4;53m"
+   #     OFF="${csi}0m"
+   OFF="$(tput sgr0)"
+  Y_ON_B="${csi}8;37;44m"
+  ULON="$(tput smul)"
+  ULOFF="$(tput rmul)"
+
+  
+git_color() {
+  local git_status="$(git status 2> /dev/null)"
+
+  if [[ ! $git_status =~ "working tree clean" ]]; then
+    echo -e "$RED"
+  elif [[ $git_status =~ "Your branch is ahead of" ]]; then
+    echo -e "$YELLOW"
+  elif [[ $git_status =~ "nothing to commit" ]]; then
+    echo -e "$GREEN"
+  else
+    echo -e "$OCHRE"
+  fi
+}
+  
+# Right side prompt experiments
+
+# Right-aligned working directory
+# https://superuser.com/questions/187455/right-align-part-of-prompt/1203400#1203400
+
+# Create a string like:  "[ Apr 25 16:06 ]" with time in RED.
+# printf -v PS1RHS "\e[0m[ \e[0;1;31m%(%b %d %H:%M)T \e[0m]" -1 # -1 is current time
+
+# Working directory. Outer square brackets handled below.
+PS1RHS='\[$CYAN\]\w\[$OFF\]'
+
+# Strip ANSI commands before counting length
+# From: https://www.commandlinefu.com/commands/view/12043/remove-color-special-escape-ansi-codes-from-text-with-sed
+PS1RHS_stripped=$(sed "s,\x1B\[[0-9;]*[a-zA-Z],,g" <<<"$PS1RHS")
+
+# Reference: https://en.wikipedia.org/wiki/ANSI_escape_code
+# local Save='\e[s' # Save cursor position
+# local Rest='\e[u' # Restore cursor to save point
+# Save='\e[s' # Save cursor position
+# Restore='\e[u' # Restore cursor to save point
+# Use tput instead of hardcoding \e[s and \e[u to appease Terminal.app 
+Save=$(tput sc)
+Restore=$(tput rc)
+
+# Save cursor position, jump to right hand edge, then go left N columns where
+# N is the length of the printable RHS string. Print the RHS string, then
+# return to the saved position and print the LHS prompt.
+# Note: "\[" and "\]" are used so that bash can calculate the number of
+# printed characters so that the prompt doesn't do strange things when
+# editing the entered text.
+# CSI n C - move cursor forward
+# CSI n D - move cursor back
+# orig PS1
+# PS1="\[${Save}\e[${COLUMNS:-$(tput cols)}C\e[${#PS1RHS_stripped}D${PS1RHS}${Rest}\]${PS1}"
+#
+# more experiments
+# PS1="\[${Save}${csi}\${COLUMNS:-\$(tput cols)}C${csi}\$(pwd_len)D${PS1RHS}${Restore}\]${PS1}"
+
+# default PS1
+export PS1='\[$OFF$ULON$GRAY\]\u@\h\[$OFF$CYAN\] \W\[$(git_color)\]$(parse_git_branch)\[$OFF\] \[\e[37m\]\$ \[\e[1;37m\]'
+
+if [[ $ITERM_SHELL_INTEGRATION_INSTALLED = "Yes" ]]; then
+    # https://iterm2.com/documentation-badges.html
+    printf -v IT2_BADGE "\e]1337;SetBadgeFormat=%s\a" \
+	   $(echo -n "\(user.gitBranch) " | base64)
+    PS1RHS=$IT2_BADGE
+else
+    # $csi is broken. Hard coding it works (see next).
+    # PS1RHS='\[$Save$ULON$csi${COLUMNS:-$(tput cols)}C$csi$(pwd_len)D$CYAN\]\w\[$OFF$Restore\]'
+    # This works, but it can cramp space when deep in the filesystem
+    PS1RHS='\[$Save\e[${COLUMNS:-$(tput cols)}C\e[$(pwd_len)D$ULON\]\w\[$OFF$Restore\]'
+    # printf -v PS1RHS "\[$Save]\w\[$Restore\]"
+    # PS1RHS=""
+fi
+
+if [[ $TERM == dumb ]]; then
+    PS1="\$ "
+elif [[ $TERM_PROGRAM == Apple_Terminal ]]; then
+    # PROMPT_COMMAND puts path in tab already
+    PS1=$PS1 # noop
+else
+    # with righthand prompt too
+    PS1="$PS1RHS$PS1"
+fi
+#debug echo "PS1=$PS1"
+
+
+# PS0 is evaluated just before a command is run.
+# It could be used like this to run a function:
+#
+# pre_exec(){
+#     echo "Do something."
+# }
+# export PS0='$(pre_exec)\[\e[0m\]'
+#
+# but it's merely resetting the text color here.
+if [[ $TERM != dumb* ]]; then
+    export PS0='\[\e[0m\]'
+fi
+
+# pre_prompt() {
+# #                                    Right   Left
+#      PS1=$(printf "%${COLUMNS}s\r%s" "\w" "$PS1")
+# }
+# PROMPT_COMMAND=pre_prompt
+
+# print_pre_prompt(){
+# }
+# PROMPT_COMMAND=print_pre_prompt
+
+# from https://serverfault.com/questions/3743/what-useful-things-can-one-add-to-ones-bashrc
+
+export LESS_TERMCAP_mb=$'\033[01;31m'
+export LESS_TERMCAP_md=$'\033[01;31m'
+export LESS_TERMCAP_me=$'\033[0m'
+export LESS_TERMCAP_se=$'\033[0m'
+export LESS_TERMCAP_so=$'\033[01;44;33m'
+export LESS_TERMCAP_ue=$'\033[0m'
+export LESS_TERMCAP_us=$'\033[01;32m'
+
