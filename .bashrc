@@ -29,14 +29,14 @@ done
 #mw Confusing. Add bashrc, inputrc back into the list above if we find a need.
 # [ -r "$XDG_CONFIG_HOME/bash/inputrc" ] && . "$XDG_CONFIG_HOME/bash/inputrc"
 
-# If not running interactively, don't do anything
+# If not running interactively, don't load any more
 [[ $- != *i* ]] && return
 
 for SUBFILE in completion aliases prompt lattice-aliases; do
     [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 done
 
-if [[ $ITERM_PROGRAM = "iTerm.app" ]]; then
+if [[ $TERM_PROGRAM = "iTerm.app" ]]; then
     SUBFILE=iterm2_shell_integration.bash
     [[ -f "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 fi

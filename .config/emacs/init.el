@@ -90,7 +90,7 @@
      ("FIXME" . "#dc752f")
      ("XXX+" . "#dc752f")
      ("\\?\\?\\?+" . "#dc752f"))))
- '(ivy-mode 't)
+ '(ivy-mode nil)
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
@@ -104,11 +104,12 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
+    (sql-mode calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
  '(package-user-dir "~/lib/elpa")
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
  '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
  '(spaceline-all-the-icons-separator-type (quote arrow))
+ '(tool-bar-mode nil)
  '(tool-bar-style (quote text))
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map
@@ -245,6 +246,7 @@ There are two things you can do about this warning:
 ;; Try Ivy/Swiper/Counsel
 ;; https://truthseekers.io/lessons/how-to-use-ivy-swiper-counsel-in-emacs-for-noobs/
 (use-package ivy
+  :disabled
   :bind 
   ("C-s" . swiper)  ;; replaces i-search with swiper
   ("M-x" . counsel-M-x) ;; Gives M-x command counsel features
@@ -285,8 +287,8 @@ There are two things you can do about this warning:
    '(("j" switch-to-buffer-other-frame "other frame")
      ("k" kill-buffer "kill")
      ("r" ivy--rename-buffer-action "rename")))
-  )
-  ;; end Ivy
+  )  ;; end use-package Ivy
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -443,6 +445,7 @@ There are two things you can do about this warning:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+(appt-activate 1) ;; Enable appointment reminders
 ;; https://github.com/kiwanami/emacs-calfw
 (use-package calfw)
 (use-package calfw-cal) ;; for diary entries
@@ -504,7 +507,6 @@ There are two things you can do about this warning:
 
 ;; https://writequit.org/articles/working-with-logs-in-emacs.html
 (use-package log4j-mode
-  :ensure t
   :disabled t
   :init
   (add-hook #'log4j-mode-hook #'view-mode)
@@ -660,13 +662,32 @@ Version 2018-08-30"
 (global-set-key (kbd "<C-M-next>") 'forward-page)   ; Ctrl+Alt+PageDown
 
 (use-package projectile
-  :ensure t
   :config
   ;;mw Don't have a "Super" key defined on my mac (yet, 2019-10)
   ;; (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1))
 
+(setq sql-connection-alist '(
+      ("qa-redshift"
+	(sql-product 'postgres)
+	(sql-user "segment")
+	(sql-server "lpi.cegcmwpsftfz.us-east-1.redshift.amazonaws.com")
+	(sql-database "app")
+	(sql-port 5439))
+      ("test-redshift"
+       (sql-product 'postgres)
+       (sql-user "segment")
+       (sql-server "mwarren-test.cegcmwpsftfz.us-east-1.redshift.amazonaws.com")
+       (sql-database "app")
+       (sql-port 5439))
+      ("prod-redshift"
+       (sql-product 'postgres)
+       (sql-user "segment")
+       (sql-server "mwarren-test.cegcmwpsftfz.us-east-1.redshift.amazonaws.com")
+       (sql-database "app")
+       (sql-port 5439))
+      ))
 
 ;; https://www.emacswiki.org/emacs/Desktop
 (setq desktop-buffers-not-to-save
@@ -674,6 +695,7 @@ Version 2018-08-30"
                 "^nn\\.a[0-9]+\\|\\.log\\|(ftp)\\|^tags\\|^TAGS"
                 "\\|\\.emacs.*\\|\\.diary\\|\\.newsrc-dribble\\|\\.bbdb"
 	        "\\)$"))
+
 
 ;;mw Use customize instead
 ;; (add-to-list 'desktop-modes-not-to-save 'fundamental-mode)
@@ -686,6 +708,6 @@ Version 2018-08-30"
 (server-start)
 
 ;; Automatically inserted by emacs
-(put 'scroll-left 'disabled nil)
 
 (put 'narrow-to-page 'disabled nil)
+(put 'scroll-left 'disabled nil)

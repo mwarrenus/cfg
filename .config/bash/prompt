@@ -124,6 +124,9 @@ if [[ $TERM == dumb ]]; then
 elif [[ $TERM_PROGRAM == Apple_Terminal ]]; then
     # PROMPT_COMMAND puts path in tab already
     PS1=$PS1 # noop
+elif [[ $TERM_PROGRAM == iTerm.app ]]; then
+    [ $DEBUG ] && echo "setting iTerm2"
+    PS1="\\[\e];\w\007\\]$PS1"
 else
     # with righthand prompt too
     PS1="$PS1RHS$PS1"

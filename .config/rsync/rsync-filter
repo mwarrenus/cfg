@@ -1,6 +1,13 @@
+- Applications/
 - Backups/
+- Docker/
+- Downloads/
+- Library/
 - OneDrive - Lattice Engines/
+- OneDrive - Dun and Bradstreet/
 - Pictures/
++ /Users/mwarren/Projects/recover4.1.4/
++ /Users/mwarren/Projects/emacs/
 - Projects/
 - 1drive
 + /Users/mwarren/Library/Keychains/
@@ -28,6 +35,8 @@
 - .local/share/mime/
 - .local/share/virtualenvs/
 - .lnav/
++ .m2/settings.xml
++ .m2/settings-security.xml
 - .m2/
 - .matplotlib/
 - .npm/
@@ -46,12 +55,8 @@
 - .Xauthority/
 - .vscode/
 - .wine/
-- Applications/
-- Docker/
-- Downloads/
-- Library/
-- Projects/
 - lib/
+- perl5/
 - tmp/
 - workspace/
 - *~
