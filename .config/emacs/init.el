@@ -73,6 +73,7 @@
      ("/Users/mwarren/Projects/leui" "leui")
      ("/Users/mwarren/Projects/emacs/mituharu-emacs-mac-3bf213d502a8" "emacs"))))
  '(fci-rule-color "#5B6268")
+ '(gnus-secondary-select-methods (quote ((nnreddit ""))))
  '(hl-todo-keyword-faces
    (quote
     (("TODO" . "#dc752f")
@@ -104,7 +105,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (sql-mode calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
+    (nnreddit sql-mode calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
  '(package-user-dir "~/lib/elpa")
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
  '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
@@ -449,6 +450,11 @@ There are two things you can do about this warning:
 ;; https://github.com/kiwanami/emacs-calfw
 (use-package calfw)
 (use-package calfw-cal) ;; for diary entries
+
+(use-package calfw-gcal
+  :config
+  (define-key cfw: calendar-mode-map (kbd "a" ) 'cfw: gcal-main)
+  )
 
 ;; Unicode thin
 ;; (setq cfw:fchar-horizontal-line 9472
