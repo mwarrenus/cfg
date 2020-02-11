@@ -1,15 +1,15 @@
 #   -*- shell-script -*-
 [ $DEBUG ] && echo "in aliases"
 
-alias ec="emacsclient -n"
+alias ec="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient --no-wait --alternate-editor=/Applications/Emacs.app/Contents/MacOS/Emacs"
 alias p=pushd
 alias pp=popd
 
 
 alias dirs='echo -en "$GRAY"; dirs -v; echo -en "$OFF"'
 
-alias jfind="find . -name \*.java -type f | xargs grep -i "
-alias xfind="find . -name pom.xml -type f | xargs grep -i "
+alias jfind="find . -name \*.java -type f | xargs -P6 grep -i "
+alias xfind="find . -name pom.xml -type f | xargs -P6 grep -i "
 
 # better safe than sorry
 alias rm="rm -i"

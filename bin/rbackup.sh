@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # https://web.archive.org/web/20190219014953/https://blog.interlinked.org/tutorials/rsync_time_machine.html
-date=`date "+%Y-%m-%dT%H_%M_%S"`
-day=`date "+%Y-%m-%d"`
+# date=`date "+%Y%m%dT%H%M%S%z"`
+#day=`date "+%Y%m%d"`
+date=`date -Iseconds`
+day=`date -I`
 HOME="/Users/mwarren/"
 BACKUPDIR="/Users/mwarren/Backups"
 daydir="$BACKUPDIR/$day"
