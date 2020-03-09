@@ -60,7 +60,7 @@
  '(custom-enabled-themes (quote (idea-darkula-mw)))
  '(custom-safe-themes
    (quote
-    ("f2b83b9388b1a57f6286153130ee704243870d40ae9ec931d0a1798a5a916e76" "a2286409934b11f2f3b7d89b1eaebb965fd63bc1e0be1c159c02e396afb893c8" "b8c540fe258780c3aabd79affb9c0b7d560c46b372c90abb756432a4c872f8dc" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "2d1fe7c9007a5b76cea4395b0fc664d0c1cfd34bb4f1860300347cdad67fb2f9" "f30aded97e67a487d30f38a1ac48eddb49fdb06ac01ebeaff39439997cbdd869" "420689cc31d01fe04b8e3adef87b8838ff52faa169e69ca4e863143ae9f3a9f9" default)))
+    ("108ea265779bcdc457d04ecef23ba6c67f531235aa1a45c69db8f37ba569cd3d" "f2b83b9388b1a57f6286153130ee704243870d40ae9ec931d0a1798a5a916e76" "a2286409934b11f2f3b7d89b1eaebb965fd63bc1e0be1c159c02e396afb893c8" "b8c540fe258780c3aabd79affb9c0b7d560c46b372c90abb756432a4c872f8dc" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "2d1fe7c9007a5b76cea4395b0fc664d0c1cfd34bb4f1860300347cdad67fb2f9" "f30aded97e67a487d30f38a1ac48eddb49fdb06ac01ebeaff39439997cbdd869" "420689cc31d01fe04b8e3adef87b8838ff52faa169e69ca4e863143ae9f3a9f9" default)))
  '(datetime-timezone (quote America/Los_Angeles))
  '(desktop-modes-not-to-save
    (quote
@@ -75,6 +75,7 @@
      ("/Users/mwarren/Projects/emacs/mituharu-emacs-mac-3bf213d502a8" "emacs"))))
  '(fci-rule-color "#5B6268")
  '(gnus-secondary-select-methods (quote ((nnreddit ""))))
+ '(grep-command "pcregrep  -Hin ")
  '(hl-todo-keyword-faces
    (quote
     (("TODO" . "#dc752f")
@@ -106,7 +107,7 @@
  '(objed-cursor-color "#ff6c6b")
  '(package-selected-packages
    (quote
-    (vlf calfw-gcal nnreddit sql-mode calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons doom-themes spaceline powerline-evil flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell evil-unimpaired evil-mc evil-matchit evil-magit evil-lisp-state evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
+    (powershell calfw-cal vlf calfw-gcal nnreddit sql calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons spaceline flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
  '(package-user-dir "~/lib/elpa")
  '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
  '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
@@ -142,7 +143,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 130 :width normal :foundry "nil" :family "Iosevka"))))
+ ;; Iosevka
+ ;; '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil
+ ;; 			:overline nil :underline nil :slant normal :weight normal :height 130 :width normal
+ ;; 			:foundry "nil" :family "Iosevka"))))
+ ;; Fira Code
+ '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil
+			 :overline nil :underline nil :slant normal :weight normal :height 98 :width normal
+			 :foundry "outline" :family "Fira Code Retina"))))
  '(Man-overstrike ((t (:inherit bold :foreground "orange"))))
  '(Man-underline ((t (:inherit underline :foreground "medium spring green"))))
  '(cfw:face-toolbar-button-off ((t (:foreground "Gray40" :weight bold))))
@@ -197,12 +205,14 @@ There are two things you can do about this warning:
     ;;mw Advise/redefine to show missing packages when difference > 0
     ;; from lisp/elisp/package.el
     (progn
+      (unless (package-installed-p 'advice-patch)
+	  (package-install 'advice-patch))
       (require 'advice-patch)
       (with-demoted-errors "Error in advice-patch of package-install-selected-packages: %S"
 	(advice-patch 'package-install-selected-packages
-		      '(message "%d packages are not available (the rest are already installed); maybe you need to `M-x package-refresh-contents'. 
-                  Not available: %s" difference (cl-set-difference not-installed available))
-		      '(message "Packages that are not available: %d (the rest is already installed), maybe you need to `M-x package-refresh-contents'"
+		       '(message "%d packages are not available (the rest are already installed); maybe you need to `M-x package-refresh-contents'. 
+                  Not available: %s" difference (cl-set-difference not-installed available))		    
+		      '(message "%s packages are not available (the rest already installed), maybe you need to `M-x package-refresh-contents'"
 				difference)))
 
       ;;mw The package built-in is more full featured than other hand written workarounds.

@@ -133,7 +133,9 @@ elif [[ $TERM_PROGRAM == iTerm.app ]]; then
     PS1="\\[\e];\w\007\\]$PS1"
 else
     # with righthand prompt too
-    PS1="$PS1RHS$PS1"
+    #mw Annoying on Windows
+    #PS1="$PS1RHS$PS1"
+    PS1="$PS1"
 fi
 #debug echo "PS1=$PS1"
 

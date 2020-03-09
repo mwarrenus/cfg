@@ -1,7 +1,13 @@
 #   -*- shell-script -*-
 [ $DEBUG ] && echo "in aliases"
 
-alias ec="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient --no-wait --alternate-editor=/Applications/Emacs.app/Contents/MacOS/Emacs"
+if $darwin; then
+    alias ec="/Applications/Emacs.app/Contents/MacOS/bin/emacsclient --no-wait --alternate-editor=/Applications/Emacs.app/Contents/MacOS/Emacs"
+fi
+if $mingw; then
+    alias ec='emacsclientw.exe -n --alternate-editor="" -c "$@"'
+fi
+
 alias p=pushd
 alias pp=popd
 
@@ -40,7 +46,7 @@ unset LS
 
 # From https://www.atlassian.com/git/tutorials/dotfiles
 # git init --bare $HOME/.cfg
-alias config='GIT_AUTHOR_EMAIL=$HOME_EMAIL /usr/bin/git --git-dir=$HOME/.cfg --work-tree=$HOME' 
+alias config='GIT_AUTHOR_EMAIL=$HOME_EMAIL git --git-dir=$HOME/.cfg --work-tree=$HOME' 
 # config config --local status.showUntrackedFiles no
 
 # zoonavigator - from Jignesh

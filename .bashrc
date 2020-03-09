@@ -6,8 +6,8 @@
 # DEBUG=1
 [ $DEBUG ] && echo "in .bashrc"
 
-# Default PATH to something useable
-export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+# Default PATH to something useable if necessary.
+if [ -z "$PATH" ]; then export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin; fi
 
 # XDG directories
 ### http://rafi.io/shell/pimp-up-your-shell/
@@ -22,12 +22,10 @@ export   XDG_DATA_HOME="$HOME/.local/share"
 export INPUTRC="$XDG_CONFIG_HOME"/bash/inputrc
 
 # Explicit ordering instead of just globbing the directory
+# add bashrc, inputrc back into the list if/when needed
 for SUBFILE in functions exports secrets lattice; do
     [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 done
-
-#mw Confusing. Add bashrc, inputrc back into the list above if we find a need.
-# [ -r "$XDG_CONFIG_HOME/bash/inputrc" ] && . "$XDG_CONFIG_HOME/bash/inputrc"
 
 # If not running interactively, don't load any more
 [[ $- != *i* ]] && return
@@ -41,3 +39,4 @@ if [[ $TERM_PROGRAM = "iTerm.app" ]]; then
     [[ -f "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
 fi
 
+pathdedupe
