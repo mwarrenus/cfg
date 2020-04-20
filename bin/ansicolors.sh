@@ -1,14 +1,32 @@
-#!/bin/bash
+#!/usr/bin/env ash
 # from https://askubuntu.com/questions/27314/script-to-display-all-terminal-colors
-for x in {0..8}; do 
-    for i in {30..37}; do 
-		for a in {40..47}; do 
-            echo -en "$EINS \033[$x;$i;$a""m\\\033[$x;$i;$a""m\033[0;37;40m "
-        done
-        echo -en "\033[0m"
+# for x in {0..8}; do 
+#     for i in {30..37}; do 
+# 		for a in {40..47}; do 
+#             echo -en "$EINS \033[$x;$i;$a""m\\\033[$x;$i;$a""m\033[0;37;40m "
+#         done
+#         echo -en "\033[0m"
+# 		echo
+# 	done
+# done
+
+# POSIX version without bash'isms
+i=0; m=8 # while [ $i -le $m ]
+for i in 0 1 4 5 7 8; do
+	j=30; n=37
+	while [ $j -le $n ]; do
+		k=40; o=47
+		while [ $k -le $o ]; do
+		    echo -en "$EINS \033[$i;$j;$k""m\\\033[$i;$j;$k""m\033[0;37;40m "
+			k=$(($k + 1))
+		done
+		j=$(($j + 1))
+	    echo -en "\033[0m"
 		echo
 	done
+	i=$(($i + 1))
 done
+
 echo ""
 
 
@@ -45,7 +63,7 @@ color and text formatting
 ESC[#(;#)m there can be multiple text formatting sequence numbers separated by a ; and ending with an m where
 the # is of the following values:
 
-attributes
+attributes (2, 3, 6 skipped?)
 0	normal display
 1	bold
 4	underline (mono only)
