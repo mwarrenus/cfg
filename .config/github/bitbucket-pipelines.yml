@@ -1,7 +1,11 @@
-clone:
-  depth: full
 pipelines:
   default:
     - step:
+        name: Sync cfg.git to GitHub Mirror
+        image: alpine/git:latest
+        clone:
+          enabled: false
         script:
+          - git clone --bare git@bitbucket.org:m_warren/cfg.git
+          - cd cfg.git
           - git push --mirror git@github.com:mwarrenus/cfg.git
