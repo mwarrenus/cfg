@@ -45,7 +45,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(Man-notify-method (quote pushy))
+ '(Info-default-directory-list
+   '("\"%emacs_dir%/share/info/\" \"c:/Program Files/emacs/x86_64/share/info\" \"c:/Program Files/emacs/share/info\""))
+ '(Man-notify-method 'pushy)
  '(ansi-color-names-vector
    ["#0a0814" "#f2241f" "#67b11d" "#b1951d" "#4f97d7" "#a31db1" "#28def0" "#b2b2b2"])
  '(blink-cursor-mode nil)
@@ -57,28 +59,24 @@
  '(cfw:fchar-top-left-corner 9581)
  '(cfw:fchar-top-right-corner 9582)
  '(cfw:fchar-vertical-line 9474)
- '(custom-enabled-themes (quote (idea-darkula-mw)))
+ '(custom-enabled-themes '(idea-darkula-mw))
  '(custom-safe-themes
-   (quote
-	("108ea265779bcdc457d04ecef23ba6c67f531235aa1a45c69db8f37ba569cd3d" "f2b83b9388b1a57f6286153130ee704243870d40ae9ec931d0a1798a5a916e76" "a2286409934b11f2f3b7d89b1eaebb965fd63bc1e0be1c159c02e396afb893c8" "b8c540fe258780c3aabd79affb9c0b7d560c46b372c90abb756432a4c872f8dc" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "2d1fe7c9007a5b76cea4395b0fc664d0c1cfd34bb4f1860300347cdad67fb2f9" "f30aded97e67a487d30f38a1ac48eddb49fdb06ac01ebeaff39439997cbdd869" "420689cc31d01fe04b8e3adef87b8838ff52faa169e69ca4e863143ae9f3a9f9" default)))
- '(datetime-timezone (quote America/Los_Angeles))
+   '("108ea265779bcdc457d04ecef23ba6c67f531235aa1a45c69db8f37ba569cd3d" "f2b83b9388b1a57f6286153130ee704243870d40ae9ec931d0a1798a5a916e76" "a2286409934b11f2f3b7d89b1eaebb965fd63bc1e0be1c159c02e396afb893c8" "b8c540fe258780c3aabd79affb9c0b7d560c46b372c90abb756432a4c872f8dc" "bffa9739ce0752a37d9b1eee78fc00ba159748f50dc328af4be661484848e476" "2d1fe7c9007a5b76cea4395b0fc664d0c1cfd34bb4f1860300347cdad67fb2f9" "f30aded97e67a487d30f38a1ac48eddb49fdb06ac01ebeaff39439997cbdd869" "420689cc31d01fe04b8e3adef87b8838ff52faa169e69ca4e863143ae9f3a9f9" default))
+ '(datetime-timezone 'America/Los_Angeles)
  '(desktop-modes-not-to-save
-   (quote
-	(tags-table-mode dired-mode Info-mode treemacs-mode info-lookup-mode fundamental-mode)))
+   '(tags-table-mode dired-mode Info-mode treemacs-mode info-lookup-mode fundamental-mode))
  '(desktop-save-mode t)
  '(display-time-format "%I:%M")
  '(ecb-options-version "2.50")
  '(ecb-source-path
-   (quote
-	(("/Users/mwarren/Projects/ledp" "ledp")
+   '(("/Users/mwarren/Projects/ledp" "ledp")
 	 ("/Users/mwarren/Projects/leui" "leui")
-	 ("/Users/mwarren/Projects/emacs/mituharu-emacs-mac-3bf213d502a8" "emacs"))))
+	 ("/Users/mwarren/Projects/emacs/mituharu-emacs-mac-3bf213d502a8" "emacs")))
  '(fci-rule-color "#5B6268")
- '(gnus-secondary-select-methods (quote ((nnreddit ""))))
+ '(gnus-secondary-select-methods '((nnreddit "")))
  '(grep-command "pcregrep  -Hin ")
  '(hl-todo-keyword-faces
-   (quote
-	(("TODO" . "#dc752f")
+   '(("TODO" . "#dc752f")
 	 ("NEXT" . "#dc752f")
 	 ("THEM" . "#2d9574")
 	 ("PROG" . "#4f97d7")
@@ -92,29 +90,28 @@
 	 ("TEMP" . "#b1951d")
 	 ("FIXME" . "#dc752f")
 	 ("XXX+" . "#dc752f")
-	 ("\\?\\?\\?+" . "#dc752f"))))
+	 ("\\?\\?\\?+" . "#dc752f")))
  '(ivy-mode nil)
  '(jdee-db-active-breakpoint-face-colors (cons "#1B2229" "#51afef"))
  '(jdee-db-requested-breakpoint-face-colors (cons "#1B2229" "#98be65"))
  '(jdee-db-spec-breakpoint-face-colors (cons "#1B2229" "#3f444a"))
  '(logview-additional-timestamp-formats
-   (quote
-	(("LElogs"
-	  (java-pattern . "yyyy-MM-dd'T'HH:mm:ss,SSS'Z'")))))
+   '(("LElogs"
+	  (java-pattern . "yyyy-MM-dd'T'HH:mm:ss,SSS'Z'"))))
  '(lsp-enable-file-watchers nil)
  '(lsp-java-server-install-dir "~/lib/eclipse.jdt.ls/server/")
  '(lsp-java-workspace-dir "/Users/mwarren/workspace/")
  '(objed-cursor-color "#ff6c6b")
+ '(package-check-signature t)
  '(package-selected-packages
-   (quote
-	(powershell calfw-cal vlf calfw-gcal nnreddit sql calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons spaceline flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link)))
+   '(gnu-elpa-keyring-update url-http-ntlm powershell calfw-cal vlf calfw-gcal nnreddit sql calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons spaceline flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link))
  '(package-user-dir "~/lib/elpa")
- '(pdf-view-midnight-colors (quote ("#b2b2b2" . "#292b2e")))
- '(spaceline-all-the-icons-icon-set-window-numbering (quote square))
- '(spaceline-all-the-icons-separator-type (quote arrow))
+ '(pdf-view-midnight-colors '("#b2b2b2" . "#292b2e"))
+ '(spaceline-all-the-icons-icon-set-window-numbering 'square)
+ '(spaceline-all-the-icons-separator-type 'arrow)
  '(tab-width 4)
  '(tool-bar-mode nil)
- '(tool-bar-style (quote text))
+ '(tool-bar-style 'text)
  '(vc-annotate-background "#282c34")
  '(vc-annotate-color-map
    (list
@@ -177,7 +174,7 @@ There are two things you can do about this warning:
     (add-to-list 'package-archives (cons "gnu" (concat proto "://elpa.gnu.org/packages/")))))
 
 (add-to-list 'package-archives
-             '("org" . "http://orgmode.org/elpa/"))
+             '("org" . "https://orgmode.org/elpa/"))
 
 ; Enable all dirs from .config/emacs/elisp
 (add-to-list 'load-path (expand-file-name "elisp" user-emacs-directory))
@@ -412,7 +409,9 @@ There are two things you can do about this warning:
 ;;   (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable 1))))
 
 (use-package magit
-  :defer)
+  :defer
+  :bind ("C-x g" . 'magit-status)
+  )
 
 (use-package magit-find-file
   :defer

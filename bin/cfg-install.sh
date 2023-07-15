@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# d93fw64xnUYW524FTvUJ
 git clone --bare git@bitbucket.org:m_warren/cfg.git $HOME/.cfg
 function config {
    /usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME $@
