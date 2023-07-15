@@ -21,22 +21,26 @@ export   XDG_DATA_HOME="$HOME/.local/share"
 # Ref. https://wiki.archlinux.org/index.php/XDG_Base_Directory
 export INPUTRC="$XDG_CONFIG_HOME"/bash/inputrc
 
+source_file() {
+	[[ -r "$XDG_CONFIG_HOME/bash/$1" ]] && source "$XDG_CONFIG_HOME/bash/$1"
+}
+
 # Explicit ordering instead of just globbing the directory
 # add bashrc, inputrc back into the list if/when needed
 for SUBFILE in functions exports secrets lattice; do
-    [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
+    source_file $SUBFILE
 done
 
 # If not running interactively, don't load any more
 [[ $- != *i* ]] && return
 
-for SUBFILE in completion aliases prompt lattice-aliases; do
-    [[ -r "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
+# for SUBFILE in completion aliases prompt lattice-aliases; do
+for SUBFILE in completion aliases prompt; do
+    source_file $SUBFILE
 done
 
 if [[ $TERM_PROGRAM = "iTerm.app" ]]; then
-    SUBFILE=iterm2_shell_integration.bash
-    [[ -f "$XDG_CONFIG_HOME/bash/$SUBFILE" ]] && source "$XDG_CONFIG_HOME/bash/$SUBFILE"
+    source_file iterm2_shell_integration.bash
 fi
 
 pathdedupe
