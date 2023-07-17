@@ -101,6 +101,7 @@
  '(lsp-enable-file-watchers nil)
  '(lsp-java-server-install-dir "~/lib/eclipse.jdt.ls/server/")
  '(lsp-java-workspace-dir "/Users/mwarren/workspace/")
+ '(magit-define-global-key-bindings 'recommended)
  '(objed-cursor-color "#ff6c6b")
  '(package-check-signature t)
  '(package-selected-packages
@@ -347,12 +348,12 @@ There are two things you can do about this warning:
 ;;
 ;; LSP - Language Server Protocol. Newer, lighter weight option using the lsp protocol from Microsoft
 (use-package company-lsp
-   :defer
+   :defer t
    :config
    (push 'company-lsp company-backends))
 
 (use-package flycheck
-  :defer
+  :defer t
   )
 
 ;; Language Server Protocol
@@ -389,7 +390,7 @@ There are two things you can do about this warning:
 
 
 (use-package lsp-ui
-  :defer
+  :defer t
   :bind (:map lsp-ui-mode-map ([remap xref-find-definitions] . #'lsp-ui-peek-find-definitions)
 	      ([remap xref-find-references] . #'lsp-ui-peek-find-references))
   :config (progn
@@ -408,16 +409,53 @@ There are two things you can do about this warning:
 ;; (with-eval-after-load 'lsp-mode
 ;;   (add-hook 'lsp-after-open-hook (lambda () (lsp-ui-flycheck-enable 1))))
 
+
+;; Use magit with my config system. Suggested by
+;; https://emacs.stackexchange.com/questions/30602/use-nonstandard-git-directory-with-magit
+;; prepare the arguments
+(setq configs-git-dir (concat "--git-dir=" (expand-file-name "~/.cfg")))
+(setq configs-work-tree (concat "--work-tree=" (expand-file-name "~")))
+
+;;  (global-set-key (kbd "<f5> d") 'magit-status-configs)
+
+;; redirect global magit hotkey to our wrapper
+;; mw - moved to use-package below
+;;  (global-set-key (kbd "C-x g") 'magit-status-regular)
+;;  (define-key magit-file-mode-map (kbd "C-x g") 'magit-status-regular)
+
+
 (use-package magit
-  :defer
-  :bind ("C-x g" . 'magit-status)
+  :defer t
+  :init 
+  :bind (("C-x g" . 'magit-status-regular)
+		 ("<f5> g" . 'magit-status-configs))
+;;         :map magit-file-mode-map
+;;		 ("C-x g" . magit-status-regular))
+  :config
+  ;; function to start magit on configs
+  (defun magit-status-configs ()
+	(interactive)
+	(add-to-list 'magit-git-global-arguments configs-git-dir)
+	(add-to-list 'magit-git-global-arguments configs-work-tree)
+	(call-interactively 'magit-status))
+
+
+  ;; wrapper to remove additional args before starting magit
+  (defun magit-status-regular ()
+	(interactive)
+	(setq magit-git-global-arguments (remove configs-git-dir magit-git-global-arguments))
+	(setq magit-git-global-arguments (remove configs-work-tree magit-git-global-arguments))
+	(call-interactively 'magit-status))
+
+  ;; use customization instead
+  ;; (setq magit-define-global-key-bindings 'recommended)
+
   )
 
 (use-package magit-find-file
-  :defer
-  :bind ("C-c p" .  'magit-find-file-completing-read)
+  :defer t
+  :bind ("C-c m" .  'magit-find-file-completing-read)
   )
-
 
 ;; https://github.com/bizzyman/LSP-Symbol-Outline
 ;;mw move into lsp-mode-hook
@@ -587,8 +625,8 @@ There are two things you can do about this warning:
   :config
   (add-hook 'treemacs-mode-hook (lambda () (treemacs-resize-icons  16))))
 
-(defun toggle-n-next ()
-  (interactive)
+  (defun toggle-n-next ()
+    (interactive)
     (treemacs--expand-dir-node (treemacs-current-button))
     (treemacs-next-line))
 ;; (treemacs-define-RET-action ’dir-node-closed (lambda () (progn treemacs-toggle-node treemacs-next-line)))
@@ -634,7 +672,7 @@ There are two things you can do about this warning:
   :after treemacs magit)
 
 (use-package treemacs-projectile
-  :defer
+  :defer t
   )
 
 (use-package doom-themes
@@ -658,6 +696,7 @@ There are two things you can do about this warning:
 (defun xah-show-formfeed-as-line ()
   "Display the formfeed ^L char as line.
 URL `http://ergoemacs.org/emacs/emacs_form_feed_section_paging.html'
+New URL `http://xahlee.info/emacs/emacs/emacs_form_feed_section_paging.html'
 Version 2018-08-30"
   (interactive)
   ;; 2016-10-11 thanks to Steve Purcell's page-break-lines.el
@@ -677,6 +716,17 @@ Version 2018-08-30"
   ;; (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1))
+
+(use-package undo-tree
+  :config
+  (defun undo-tree-split-side-by-side (original-function &rest args)
+  "Split undo-tree side-by-side"
+  (let ((split-height-threshold nil)
+        (split-width-threshold 0))
+    (apply original-function args)))
+
+  (advice-add 'undo-tree-visualize :around #'undo-tree-split-side-by-side)
+  )
 
 (setq sql-connection-alist '(
       ("qa-redshift"
@@ -721,3 +771,4 @@ Version 2018-08-30"
 
 (put 'narrow-to-page 'disabled nil)
 (put 'scroll-left 'disabled nil)
+

@@ -28,6 +28,7 @@ pathappend() {
 }
 
 # Add $@ args to beginning of $PATH
+# This uses bash's indirect bang expansion to set ARG to $1, $2, ...
 pathprepend() {
   for ((i=$#; i>0; i--)); do
     ARG="${!i}"
@@ -45,10 +46,10 @@ pathdelete() {
     n=${#t[*]}
     a=()
     for ARG in "$@"; do
-	for ((i=0;i<n;i++)); do
-	    p="${t[i]%%*"$ARG"*}"
-	    [ "${p}" ] && a[i]="${p}"
-	done
+		for ((i=0;i<n;i++)); do
+			p="${t[i]%%*"$ARG"*}"
+			[ "${p}" ] && a[i]="${p}"
+		done
     done
 
     PATH="${a[*]}"
@@ -117,13 +118,13 @@ pwd_string() {
     [ $dbg -gt 0 ] && echo "dbg=$dbg: found n=$n parts in $p . Split it into ${t[@]}"
     unset IFS
     if [[ n -gt $PROMPT_DIRTRIM ]]; then
-	[ $dbg -gt 0 ] && echo "fixin stuff"
-	# put tilde back if needed. Element 0 is nil when path starts with /
-	p="${t[0]:+${t[0]}/}..."
-	for ((i=n-$PROMPT_DIRTRIM;i<n;i++)); do
+	  [ $dbg -gt 0 ] && echo "fixin stuff"
+	  # put tilde back if needed. Element 0 is nil when path starts with /
+	  p="${t[0]:+${t[0]}/}..."
+	  for ((i=n-$PROMPT_DIRTRIM;i<n;i++)); do
 	    p+="/${t[i]}"
-	done
-	[ $dbg -gt 0 ] && echo "rebuilt is ${#p} chars long: $p"
+	  done
+	  [ $dbg -gt 0 ] && echo "rebuilt is ${#p} chars long: $p"
     fi
     echo ${p}
 }

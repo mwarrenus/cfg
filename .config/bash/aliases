@@ -52,3 +52,5 @@ alias config='GIT_AUTHOR_EMAIL=$HOME_EMAIL git --git-dir=$HOME/.cfg --work-tree=
 # zoonavigator - from Jignesh
 # docker run -d --network host -e HTTP_PORT=9009 --name zoonavigator --restart unless-stopped elkozmon/zoonavigator:latest
 alias dk-zoonav='docker start zoonavigator'
+
+alias git-ls="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
