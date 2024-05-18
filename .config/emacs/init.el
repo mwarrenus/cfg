@@ -1,4 +1,5 @@
 ;; Debugging helpers
+;; Installing 
 ;; (setq debug-on-error 't)
 ;; (check-parens)
 
@@ -103,7 +104,8 @@
  '(lsp-java-workspace-dir "/Users/mwarren/workspace/")
  '(magit-define-global-key-bindings 'recommended)
  '(objed-cursor-color "#ff6c6b")
- '(package-check-signature t)
+ '(package-check-signature 'allow-unsigned)
+ ;; gnu-elpa-keyring-update requires gpg to be installed
  '(package-selected-packages
    '(gnu-elpa-keyring-update url-http-ntlm powershell calfw-cal vlf calfw-gcal nnreddit sql calfw advice-patch outline-magic flymake logview scala-mode ecb magit-find-file treemacs-magit all-the-icons-dired elisp-refs treemacs-projectile hide-mode-line lsp-mode spaceline-all-the-icons all-the-icons spaceline flycheck lsp-java which-key use-package request powerline lsp-ui idea-darkula-theme hydra exec-path-from-shell eval-sexp-fu eshell-z eshell-prompt-extras esh-help elisp-slime-nav eclim dumb-jump diminish define-word company-lsp column-enforce-mode clean-aindent-mode auto-highlight-symbol auto-compile aggressive-indent adaptive-wrap ace-window ace-link))
  '(package-user-dir "~/lib/elpa")
@@ -142,7 +144,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "outline" :family "Fira Code Retina"))))
+ '(default ((t (:inherit nil :stipple nil :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "outline" :family "Fira Code"))))
  '(Man-overstrike ((t (:inherit bold :foreground "orange"))))
  '(Man-underline ((t (:inherit underline :foreground "medium spring green"))))
  '(cfw:face-toolbar-button-off ((t (:foreground "Gray40" :weight bold))))
@@ -313,11 +315,15 @@ There are two things you can do about this warning:
     ; Better ls. https://emacs.stackexchange.com/questions/29096/how-to-sort-directories-first-in-dired
     (setq insert-directory-program "gls" dired-use-ls-dired t)
     ; for Fira Code font ligatures. https://github.com/tonsky/FiraCode/wiki/Emacs-instructions
-    (mac-auto-operator-composition-mode)
+    ; (mac-auto-operator-composition-mode)
     (setq exec-path-from-shell-arguments 'nil)
     (exec-path-from-shell-initialize)
     )
   )
+
+;; https://stackoverflow.com/questions/36183071/how-can-i-preview-markdown-in-emacs-in-real-time
+;; The value is in 1/10pt, so 100 will give you 10pt, etc.
+(set-face-attribute 'default nil :height 140)
 
 (use-package all-the-icons)
 ;;  :config
@@ -348,6 +354,7 @@ There are two things you can do about this warning:
 ;;
 ;; LSP - Language Server Protocol. Newer, lighter weight option using the lsp protocol from Microsoft
 (use-package company-lsp
+  :disabled 1
    :defer t
    :config
    (push 'company-lsp company-backends))
@@ -709,6 +716,18 @@ Version 2018-08-30"
 ;; Xah's keys for moving to prev/next code section (Form Feed; ^L). Consistent with lisp nav
 (global-set-key (kbd "<C-M-prior>") 'backward-page) ; Ctrl+Alt+PageUp
 (global-set-key (kbd "<C-M-next>") 'forward-page)   ; Ctrl+Alt+PageDown
+
+;; https://stackoverflow.com/questions/36183071/how-can-i-preview-markdown-in-emacs-in-real-time
+;; (httpd-start)
+;; M-x impatient-mode
+;; M-x imp-set-user-filter RET markdown-html RET
+;; C-x 3
+;; M-x xwidget-browse-url
+(defun markdown-html (buffer)
+    (princ (with-current-buffer buffer
+      (format "<!DOCTYPE html><html><title>Impatient Markdown</title><xmp theme=\"united\" style=\"display:none;\"> %s  </xmp><script src=\"http://ndossougbe.github.io/strapdown/dist/strapdown.js\"></script></html>" (buffer-substring-no-properties (point-min) (point-max))))
+		   (current-buffer)))
+
 
 (use-package projectile
   :config
